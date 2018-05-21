@@ -1,0 +1,30 @@
+grammar de.hs_coburg.mgse.platform.glossary.GlossaryModel with org.eclipse.xtext.common.Terminals
+
+generate glossaryModel "http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel"
+
+
+Glossary:
+	'glossary' name = ID
+	'entries'
+		(entries+=GlossaryEntry)*
+	'references'
+		(references+=GlossaryEntryReference)*
+;
+
+GlossaryEntry:
+	'entry' name=ID '=>''['
+		information=GlossaryEntryInformation
+	']'
+;
+
+GlossaryEntryInformation:
+	'word:' word=STRING
+	'meaning:' meaning=STRING
+	('abbreviation:' abbreviation=STRING)?
+;
+
+GlossaryEntryReference:
+	'entry-reference' '[' entryRef+=[GlossaryEntry|FQN] (',' vals+=[GlossaryEntry|FQN])* ']'
+;
+
+FQN: ID (('.') ID)*;
