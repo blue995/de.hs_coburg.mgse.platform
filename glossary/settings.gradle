@@ -1,0 +1,3 @@
+include 'de.hs_coburg.mgse.platform.glossary'
+include 'de.hs_coburg.mgse.platform.glossary.ide'
+include 'de.hs_coburg.mgse.platform.glossary.tests'

@@ -3,10 +3,10 @@
  */
 package de.hs_coburg.mgse.platform.glossary.validation
 
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
 import org.eclipse.xtext.validation.Check
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryModelPackage
 import org.eclipse.xtext.validation.CheckType
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryModelPackage
 
 /**
  * This class contains custom validation rules. 
@@ -26,7 +26,7 @@ class GlossaryModelValidator extends AbstractGlossaryModelValidator {
 //		}
 //	}
 
-	@Check(CheckType.FAST)
+@Check(CheckType.FAST)
 	def checkAbbreviations(Glossary glossary){
 		val abbreviations = glossary.entries.map[e | e.information.abbreviation]
 		for(var i = 0; i<abbreviations.length; i++){
