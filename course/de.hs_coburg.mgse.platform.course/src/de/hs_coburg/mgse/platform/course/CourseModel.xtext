@@ -18,9 +18,14 @@ Faculty:
 
 CourseOfStudies:
 	'Studiengang' name=ID
+	('Zulassungsvoraussetzung' requirements+=AdmissionRequirement (',' vals+=AdmissionRequirement)*)?
 	'ECTS' ects=INT
 	'Semester' semester=INT
 	'Abschluss' degree=[glossary::GlossaryEntry|FQN]
+;
+
+AdmissionRequirement:
+	value+=STRING
 ;
 
 FQN: ID (('.') ID)*;
