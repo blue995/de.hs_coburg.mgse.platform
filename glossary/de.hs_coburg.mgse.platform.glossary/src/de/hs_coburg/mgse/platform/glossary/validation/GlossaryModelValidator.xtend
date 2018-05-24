@@ -7,6 +7,8 @@ import org.eclipse.xtext.validation.Check
 import org.eclipse.xtext.validation.CheckType
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryModelPackage
+import java.util.LinkedList
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 
 /**
  * This class contains custom validation rules. 
@@ -28,38 +30,49 @@ class GlossaryModelValidator extends AbstractGlossaryModelValidator {
 
 @Check(CheckType.FAST)
 	def checkAbbreviations(Glossary glossary){
-		val abbreviations = glossary.entries.map[e | e.information.abbreviation]
-		for(var i = 0; i<abbreviations.length; i++){
-			val currentAbbreviation = abbreviations.get(i)
+		val entries = getAllEntries(glossary)
+		val abbreviations = entries.map[e | e.information.abbreviation]
+		for(var i = 0; i<entries.length; i++){
+			val currentEntry = entries.get(i)
+			val currentAbbreviation = currentEntry.information.abbreviation
 			if(abbreviations.filter[it == currentAbbreviation].size > 1){
-				error('Duplicate Abbreviation', GlossaryModelPackage.Literals.GLOSSARY__ENTRIES, i)
+				error('Duplicate Abbreviation', currentEntry.information, GlossaryModelPackage.Literals.GLOSSARY_ENTRY_INFORMATION__ABBREVIATION)
 			}
 		}
 	}
 	
 	@Check(CheckType.FAST)
 	def checkWords(Glossary glossary){
-		val words = glossary.entries.map[e | e.information.word]
-		for(var i = 0; i<words.length; i++){
-			val currentWord = words.get(i)
+		val entries = getAllEntries(glossary)
+		val words = entries.map[e | e.information.word]
+		for(var i = 0; i<entries.length; i++){
+			val currentEntry = entries.get(i)
+			val currentWord = currentEntry.information.word
 			if(words.filter[it == currentWord].size > 1){
-				error('Duplicate Word', GlossaryModelPackage.Literals.GLOSSARY__ENTRIES, i)
+				error('Duplicate Word', currentEntry.information, GlossaryModelPackage.Literals.GLOSSARY_ENTRY_INFORMATION__WORD)
 			}
 			if(currentWord.isEmpty){
-				error('Word should not be empty', GlossaryModelPackage.Literals.GLOSSARY__ENTRIES, i)
+				error('Word should not be empty', currentEntry.information, GlossaryModelPackage.Literals.GLOSSARY_ENTRY_INFORMATION__WORD)
 			}
 		}
 	}
 	
 	@Check(CheckType.FAST)
 	def checkEntryNames(Glossary glossary){
-		val entries = glossary.entries
+		val entries = getAllEntries(glossary)
 		for(var i = 0; i<entries.length; i++){
 			val currentEntry = entries.get(i)
 			if(entries.filter[it.name == currentEntry.name].size > 1){
-				error('Duplicate Entry ID', GlossaryModelPackage.Literals.GLOSSARY__ENTRIES, i)
+				error('Duplicate Entry ID', currentEntry, GlossaryModelPackage.Literals.GLOSSARY_ENTRY__NAME)
 			}
 		}
+	}
+	
+	def getAllEntries(Glossary glossary){
+		val entries = new LinkedList<GlossaryEntry>
+		entries.addAll(glossary.entries)
+		glossary.sections.forEach[section | entries.addAll(section.entries)]
+		return entries
 	}
 	
 }

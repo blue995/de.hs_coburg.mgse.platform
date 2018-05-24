@@ -5,7 +5,13 @@ generate glossaryModel "http://www.hs_coburg.de/mgse/platform/glossary/GlossaryM
 
 Glossary:
 	'glossary' name = ID
-	(entries+=GlossaryEntry)*
+	(entries+=GlossaryEntry)* & (sections+=GlossarySection)*
+;
+
+GlossarySection:
+	'Section' '[' name=ID ']'
+		(entries+=GlossaryEntry)*
+	'End'	
 ;
 
 GlossaryEntry:
@@ -18,9 +24,3 @@ GlossaryEntryInformation:
 	'meaning:' meaning=STRING
 	('abbreviation:' abbreviation=STRING)?
 ;
-
-GlossaryEntryReference:
-	'entry-reference' '[' entryRef+=[GlossaryEntry|FQN] (',' vals+=[GlossaryEntry|FQN])* ']'
-;
-
-FQN: ID (('.') ID)*;
