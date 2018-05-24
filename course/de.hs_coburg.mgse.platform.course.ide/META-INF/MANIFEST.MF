@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: de.hs_coburg.mgse.platform.course.ide
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: de.hs_coburg.mgse.platform.course.ide; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: de.hs_coburg.mgse.platform.course,
+ org.eclipse.xtext.ide,
+ org.eclipse.xtext.xbase.ide,
+ de.hs_coburg.mgse.platform.glossary;bundle-version="1.0.0",
+ de.hs_coburg.mgse.platform.glossary.ui;bundle-version="1.0.0",
+ org.antlr.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: de.hs_coburg.mgse.platform.course.ide.contentassist.antlr.internal,
+ de.hs_coburg.mgse.platform.course.ide.contentassist.antlr
+

@@ -1,0 +1,6 @@
+include 'de.hs_coburg.mgse.platform.course'
+include 'de.hs_coburg.mgse.platform.course.ide'
+include 'de.hs_coburg.mgse.platform.course.tests'
+
+include 'de.hs_coburg.mgse.platform.glossary'
+project(':de.hs_coburg.mgse.platform.glossary').projectDir = file('../glossary/de.hs_coburg.mgse.platform.glossary')

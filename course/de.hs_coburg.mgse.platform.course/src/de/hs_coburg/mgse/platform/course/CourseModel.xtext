@@ -1,0 +1,11 @@
+grammar de.hs_coburg.mgse.platform.course.CourseModel with org.eclipse.xtext.common.Terminals
+
+generate courseModel "http://www.hs_coburg.de/mgse/platform/course/CourseModel"
+
+import "http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel" as glossary
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';
