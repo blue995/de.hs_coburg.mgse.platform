@@ -4,8 +4,23 @@ generate courseModel "http://www.hs_coburg.de/mgse/platform/course/CourseModel"
 
 import "http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel" as glossary
 
+
 Model:
-	greetings+=Greeting*;
-	
-Greeting:
-	'Hello' name=ID '!';
+	Faculty
+;
+
+Faculty:
+	'Fakultaet' name=ID
+	'Studiengaenge' '['
+		(courses+=CourseOfStudies)*
+	']'
+;
+
+CourseOfStudies:
+	'Studiengang' name=ID
+	'ECTS' ects=INT
+	'Semester' semester=INT
+	'Abschluss' degree=[glossary::GlossaryEntry|FQN]
+;
+
+FQN: ID (('.') ID)*;

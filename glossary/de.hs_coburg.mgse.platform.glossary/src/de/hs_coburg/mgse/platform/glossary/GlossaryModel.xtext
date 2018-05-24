@@ -5,16 +5,12 @@ generate glossaryModel "http://www.hs_coburg.de/mgse/platform/glossary/GlossaryM
 
 Glossary:
 	'glossary' name = ID
-	'entries'
-		(entries+=GlossaryEntry)*
-	'references'
-		(references+=GlossaryEntryReference)*
+	(entries+=GlossaryEntry)*
 ;
 
 GlossaryEntry:
-	'entry' name=ID '=>''['
+	'[' name=ID ']'
 		information=GlossaryEntryInformation
-	']'
 ;
 
 GlossaryEntryInformation:
