@@ -71,7 +71,7 @@ The languages used in this example follow the folder structure described above:
     * Repeat this procedure for the following projects:
         * `A/de.hs_coburg.mgse.platform.A.ui`
         * `A/de.hs_coburg.mgse.platform.A.ide`
-2. Open `de.hs_coburg.mgse.platform.A/src/de.hs_coburg.mgse.platform.A/GenerateA.mw2`
+2. Open `de.hs_coburg.mgse.platform.A/src/de.hs_coburg.mgse.platform.A/GenerateA.mw2`  
 Add this line AFTER the `fileExtensions` property:  
 `referencedResource = "platform:/resource/de.hs_coburg.mgse.platform.B/model/generated/B.genmodel"`
 
