@@ -15,14 +15,14 @@ This repository represents the platform of our MGSE project.
 ### Folder structure
 Each folder on the first level should contain a *Xtext project* that is build with *Gradle*
 Example:
-`glossary`
-`glossary/build.gradle`
-`glossary/de.hs_coburg.mgse.platform.glossary`
-`glossary/de.hs_coburg.mgse.platform.glossary.ide`
-`glossary/de.hs_coburg.mgse.platform.glossary.target`
-`glossary/de.hs_coburg.mgse.platform.glossary.tests`
-`glossary/de.hs_coburg.mgse.platform.glossary.ui`
-`glossary/de.hs_coburg.mgse.platform.glossary.ui.tests`
+* `glossary`
+* `glossary/build.gradle`
+* `glossary/de.hs_coburg.mgse.platform.glossary`
+* `glossary/de.hs_coburg.mgse.platform.glossary.ide`
+* `glossary/de.hs_coburg.mgse.platform.glossary.target`
+* `glossary/de.hs_coburg.mgse.platform.glossary.tests`
+* `glossary/de.hs_coburg.mgse.platform.glossary.ui`
+* `glossary/de.hs_coburg.mgse.platform.glossary.ui.tests`
 
 `
 
