@@ -1,0 +1,14 @@
+glossary Begriffe
+
+Section [Abschluesse]
+	[Master_of_Science]
+	word: "Master of Science"
+	meaning: "Masterabschluss eines naturwissenschaftlichen Studienganges"
+	abbreviation: "M.Sc."
+	
+		
+	[Bachelor_of_Science]
+	word: "Bachelor of Science"
+	meaning: "Bachelorabschluss eines naturwissenschaftlichen Studienganges"
+	abbreviation: "B.Sc."
+End
