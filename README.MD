@@ -76,8 +76,8 @@ Add this line AFTER the `fileExtensions` property:
 `referencedResource = "platform:/resource/de.hs_coburg.mgse.platform.B/model/generated/B.genmodel"`
 
 ### Get your dependencies right (Gradle)
-1. Open `A/settings.gradle` and add the following lines:
-    * `include 'de.hs_coburg.mgse.platform.B'`
-    * `project(':de.hs_coburg.mgse.platform.B').projectDir = file('../B/de.hs_coburg.mgse.platform.B')`
-2. Open `A/de.hs_coburg.mgse.platform.A` and add the following line to `dependencies`:
-    * `compile project(":de.hs_coburg.mgse.platform.B")`
+1. Open `A/settings.gradle` and add the following lines:  
+`include 'de.hs_coburg.mgse.platform.B'`  
+`project(':de.hs_coburg.mgse.platform.B').projectDir = file('../B/de.hs_coburg.mgse.platform.B')`
+2. Open `A/de.hs_coburg.mgse.platform.A` and add the following line to `dependencies`:  
+`compile project(":de.hs_coburg.mgse.platform.B")`
