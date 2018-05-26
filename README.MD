@@ -29,10 +29,8 @@ Example:
 
 ## Import platform projects to current workspace
 1. File -> Open Projects from File System... -> Directory...
-2. Choose **THIS** folder
-3. Deselect the following projects:
-    1. `platform`
-    2. `platform-models/*` (All projects from `platform-models` folder)
+2. Choose the **platform** directory
+3. Uncheck the "Search for nested projects" option
 4. Finish
 
 ## Create new language
