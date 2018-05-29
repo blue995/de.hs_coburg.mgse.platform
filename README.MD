@@ -30,8 +30,9 @@ Example:
 ## Import platform projects to current workspace
 1. File -> Open Projects from File System... -> Directory...
 2. Choose the **platform** directory
-3. Uncheck the "Search for nested projects" option
-4. Finish
+3. Uncheck "platform", "platform\course", "platform\glossary" and "platform\platform-models\..."
+4. Make sure the "Search for nested projects" option is checked
+5. Finish
 
 ## Create new language
 1. File -> New -> Project... -> Xtext Project -> Next
