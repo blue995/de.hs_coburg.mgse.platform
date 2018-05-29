@@ -7,6 +7,9 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import de.hs_coburg.mgse.platform.course.courseModel.Faculty
+import de.hs_coburg.mgse.platform.course.courseModel.CourseOfStudies
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 
 /**
  * Generates code from your model files on save.
@@ -16,10 +19,44 @@ import org.eclipse.xtext.generator.IGeneratorContext
 class CourseModelGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(Greeting)
-//				.map[name]
-//				.join(', '))
+		for(e: resource.allContents.toIterable.filter(Faculty)) {
+			fsa.generateFile(
+				e.name + ".html",
+				e.compileHTML
+			)
+		}
 	}
+	
+	def compileHTML(Faculty faculty)'''
+		<!DOCTYPE html>
+		<html>
+		<head>
+		<meta charset="UTF-8">
+		<title>«faculty.name» </title>
+		</head>
+		
+		<body>
+			
+			<h1>Fakul&auml;t: «faculty.name»</h1>
+			«FOR course: faculty.courses»
+				«course.compileHTML»
+		<hr/>
+			«ENDFOR»
+		</body>
+		
+		</html> 
+	'''
+	
+	def compileHTML(CourseOfStudies cos)'''
+		<div>
+			<div>Studiengang: «cos.name»</div>
+			<div>Semester: «cos.semester»</div>
+			<div>ECTS: «cos.ects»</div>
+			«cos.degree.compileHTML»
+		</div>
+	'''
+	
+	def compileHTML(GlossaryEntry entry)'''
+		<div>Abschluss: «entry.information.word»</div>
+	'''
 }
