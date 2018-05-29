@@ -7,6 +7,9 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossarySection
 
 /**
  * Generates code from your model files on save.
@@ -16,10 +19,88 @@ import org.eclipse.xtext.generator.IGeneratorContext
 class GlossaryModelGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(Greeting)
-//				.map[name]
-//				.join(', '))
+		for(e: resource.allContents.toIterable.filter(Glossary)) {
+			fsa.generateFile(
+				e.name.toLowerCase() + ".html",
+				e.compileHTML
+			)
+			fsa.generateFile(
+				e.name.toLowerCase() + ".css",
+				compileCSS
+			)
+		}
 	}
+	
+	def compileHTML(Glossary glossary)'''
+		<!DOCTYPE html>
+		<html>
+		
+		<head>
+		    <meta charset="utf-8">
+		    <title>«glossary.name» </title>
+		    <meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		    <!-- bootstrap first, so we can overwrite values if needed -->
+		    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		    <link href="«glossary.name.toLowerCase()».css" rel="stylesheet">
+		</head>
+		
+		    <body>
+		    
+		    <!-- beginning of generated stuff once we add this to the actual project -->
+		    <div class="glossary">
+			    «FOR glossarySection: glossary.sections»
+			    	«glossarySection.compileHTML»
+			    «ENDFOR»
+		    </div> <!-- end of glossary -->
+		    <!-- end of generated stuff once we add this to the actual project -->
+		
+		    <!-- we need this here -->
+		    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+		
+		    </body>
+		
+		</html>
+	'''
+	
+	def compileHTML(GlossarySection glossarySection)'''
+		<div class="glossary__section-header">
+			«glossarySection.name»
+		</div>
+		<table class="table table-striped table-hover table-sm">
+		<thead>
+		    <tr>
+		        <th scope="col">Abk&uuml;rzung</th>
+		        <th scope="col">Wort</th>
+		        <th scope="col">Bedeutung</th>
+		    </tr>
+		    </thead>
+		    <tbody>
+		    «FOR glossaryEntry: glossarySection.entries»
+		    <tr>
+		    	«glossaryEntry.compileHTML»
+		    </tr>
+		    «ENDFOR»
+		    </tbody>
+		</table>
+	'''
+	
+	def compileHTML(GlossaryEntry entry)'''
+		<td>«entry.information.abbreviation»</td>
+		<td>«entry.information.word»</td>
+		<td>«entry.information.meaning»</td>
+	'''
+	
+	def compileCSS()'''
+		glossary {
+			border: 1px solid #ff0000;
+		}
+		
+		glossary__section-header {
+			font-size: 1.3em;
+			font-weight: 700;
+		}
+	'''
 }

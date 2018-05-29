@@ -70,7 +70,6 @@ class GlossaryModelValidator extends AbstractGlossaryModelValidator {
 	
 	def getAllEntries(Glossary glossary){
 		val entries = new LinkedList<GlossaryEntry>
-		entries.addAll(glossary.entries)
 		glossary.sections.forEach[section | entries.addAll(section.entries)]
 		return entries
 	}
