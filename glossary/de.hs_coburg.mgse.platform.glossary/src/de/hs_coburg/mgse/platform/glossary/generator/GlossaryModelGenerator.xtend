@@ -42,7 +42,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 		
 		    <!-- bootstrap first, so we can overwrite values if needed -->
 		    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-		    <link href="«glossary.name.toLowerCase()».css" rel="stylesheet">
+		    <link href="./«glossary.name.toLowerCase()».css" rel="stylesheet">
 		</head>
 		
 		    <body>
@@ -94,11 +94,11 @@ class GlossaryModelGenerator extends AbstractGenerator {
 	'''
 	
 	def compileCSS()'''
-		glossary {
+		.glossary {
 			border: 1px solid #ff0000;
 		}
 		
-		glossary__section-header {
+		.glossary__section-header {
 			font-size: 1.3em;
 			font-weight: 700;
 		}
