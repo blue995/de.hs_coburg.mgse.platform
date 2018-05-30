@@ -5,7 +5,7 @@ generate glossaryModel "http://www.hs_coburg.de/mgse/platform/glossary/GlossaryM
 
 Glossary:
 	'glossary' name = ID
-	(entries+=GlossaryEntry)* & (sections+=GlossarySection)*
+	(sections+=GlossarySection)*
 ;
 
 GlossarySection:
