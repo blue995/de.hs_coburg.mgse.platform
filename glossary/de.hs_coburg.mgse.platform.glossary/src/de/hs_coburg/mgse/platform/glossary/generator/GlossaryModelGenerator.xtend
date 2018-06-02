@@ -10,7 +10,7 @@ import org.eclipse.xtext.generator.IGeneratorContext
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossarySection
-
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntryInformation
 /**
  * Generates code from your model files on save.
  * 
@@ -28,6 +28,18 @@ class GlossaryModelGenerator extends AbstractGenerator {
 				e.name.toLowerCase() + ".css",
 				compileCSS
 			)
+		}
+		for(e: resource.allContents.toIterable.filter(GlossarySection)) {
+			fsa.generateFile(
+            	"GlossarySection.java",
+            	e.compileEntityBean
+            )
+		}
+		for(e: resource.allContents.toIterable.filter(GlossaryEntry)) {
+			fsa.generateFile(
+            	"GlossaryEntry.java",
+            	e.compileEntityBean
+            )
 		}
 	}
 	
@@ -103,4 +115,94 @@ class GlossaryModelGenerator extends AbstractGenerator {
 			font-weight: 700;
 		}
 	'''
+	
+	def compileEntityBean(GlossarySection gs)'''
+		import javax.persistence.*;
+		import java.util.List;
+	
+		@Entity(name = "GlossarySection")
+		@Table(name = "GLOSSARYSECTION")
+		public class GlossarySection {
+			@Id @GeneratedValue
+			@Column(name = "id", nullable = false)
+			private Long id;
+			
+			@Column(name = "name", nullable = false)
+			private String name;
+			
+			@OneToMany(cascade = CascadeType.ALL)
+			private List<GlossaryEntry> entries = new ArrayList<>();
+			
+			//getter and setter
+			public Long getId() {
+		    	return id;
+		   	}
+			   
+			public void setId(Long id) {
+		  		id = id;
+			}
+			
+			public String getName() {
+				return name;
+			}
+
+			public void setName(String name) {
+				name = name;
+			}
+		}
+	'''
+	def compileEntityBean(GlossaryEntry ge)'''
+		import javax.persistence.*;
+	
+		@Entity(name = "GlossaryEntry")
+		@Table(name = "GLOSSARYENTRY")
+		public class GlossaryEntry {
+			@Id @GeneratedValue
+			@Column(name = "id", nullable = false)
+			private Long id;
+				
+			@Column(name = "word", nullable = false)
+			private String word;
+				
+			@Column(name = "meaning", nullable = false)
+			private String meaning;
+				
+			@Column(name = "abbreviation", nullable = true)
+			private String abbreviation;								
+			
+			//getter and setter
+			public Long getId() {
+		    	return id;
+		   	}
+			   
+			public void setId(Long id) {
+		  		id = id;
+			}
+			
+			public String getWord() {
+				return word;
+			}
+
+			public void setWord(String word) {
+				word = word;
+			}
+			
+			public String getMeaning() {
+				return meaning;
+			}
+
+			public void setMeaning(String meaning) {
+				meaning = meaning;
+			}
+			
+			public String getAbbreviation() {
+				return abbreviation;
+			}
+
+			public void setAbbreviation(String abbreviation) {
+				abbreviation = abbreviation;
+			}
+		}
+	'''
+	
 }
