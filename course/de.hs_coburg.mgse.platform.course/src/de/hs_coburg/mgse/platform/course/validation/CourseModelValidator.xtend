@@ -3,7 +3,6 @@
  */
 package de.hs_coburg.mgse.platform.course.validation
 
-
 /**
  * This class contains custom validation rules. 
  *

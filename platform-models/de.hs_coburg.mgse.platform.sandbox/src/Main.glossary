@@ -6,6 +6,15 @@ Section [Abschluesse]
 	meaning: "Masterabschluss eines naturwissenschaftlichen Studienganges"
 	abbreviation: "M.Sc."
 	
+	[Master_of_Arts]
+	word: "Master of Arts"
+	meaning: "Masterabschluss eines geistes-, kultur-, sozial- oder wirtschaftswissenschaftlichen Studienganges"
+	abbreviation: "M.A."
+	
+	[Master_of_BA]
+	word: "Master of Business Administration"
+	meaning: "Masterabschluss eines Studienganges, welcher hauptsächlich Managementkompetenzen vermittelt."
+	abbreviation: "MBA"
 		
 	[Bachelor_of_Science]
 	word: "Bachelor of Science"

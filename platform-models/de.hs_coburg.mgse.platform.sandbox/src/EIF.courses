@@ -1,12 +1,34 @@
-Fakultaet Elektrotechnik_und_Informatik
+Fakultaet "Elektrotechnik und Informatik" [EIF]
+
 Studiengaenge [
-	Studiengang Informatik_B
+	Studiengang "Informatik" [IF_B]
 	ECTS 210
 	Semester 7
-	Abschluss Begriffe.Abschluesse.Bachelor_of_Science
+	Abschluss Bachelor of Science
 	
-	Studiengang Informatik_M
+	Studiengang "Informatik" [IF_M]
 	ECTS 90
 	Semester 3
-	Abschluss Begriffe.Abschluesse.Master_of_Science
+	Abschluss Master of Science
+]
+
+Professoren [
+	Professor [TB]
+	- Vorname "Tobias"
+	- Nachname "Blaufuß"
+	- Email "tobias.blaufuss@stud.hs-coburg.de"
+	- Raum "Oben"
+	
+	Professor [JEB]
+	- Vorname "Jonathan"
+	- Zweitname "Emmanuel"
+	- Nachname "Braat"
+	- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+	- Raum "links"
+	
+	Professor [HS]
+	- Vorname "Hakan"
+	- Nachname "Senkaya"
+	- Email "hakan.senkaya@stud.hs-coburg.de"
+	- Raum "Noch weiter oben"
 ]

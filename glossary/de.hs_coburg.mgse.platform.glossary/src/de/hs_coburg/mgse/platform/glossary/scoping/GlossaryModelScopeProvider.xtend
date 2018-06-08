@@ -3,7 +3,6 @@
  */
 package de.hs_coburg.mgse.platform.glossary.scoping
 
-
 /**
  * This class contains custom scoping description.
  * 

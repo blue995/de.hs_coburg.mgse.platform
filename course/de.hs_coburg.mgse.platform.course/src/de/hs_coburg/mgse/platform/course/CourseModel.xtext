@@ -1,27 +1,56 @@
 grammar de.hs_coburg.mgse.platform.course.CourseModel with org.eclipse.xtext.common.Terminals
 
-generate courseModel "http://www.hs_coburg.de/mgse/platform/course/CourseModel"
+generate courseModel 'http://www.hs_coburg.de/mgse/platform/course/CourseModel'
 
-import "http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel" as glossary
+import 'http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel' as glossary
 
 
 Model:
-	Faculty
+	Faculty | DegreeList
+;
+
+DegreeList:
+	 {DegreeList}
+	 'Abschlussarten' '['
+	 	(degreeClasses+=DegreeClass)*
+	 ']'
+	 'Abschlussunterarten' '['
+	 	(degrees+=Degree)*
+	 ']'
+;
+
+DegreeClass:
+	'-' '[' name=ID ']' ('(' completeName=STRING ')')?
+;
+Degree:
+	'-' '[' name=ID ']:'reference=[glossary::GlossaryEntry|FQN] 
+;
+
+Professor:
+	'Professor' '[' name=ID ']'
+		'-' 'Vorname' firstName=STRING
+		('-' 'Zweitname' middleName=STRING)?
+		'-' 'Nachname' lastName=STRING
+		'-' 'Email' email=STRING
+		'-' 'Raum' room=STRING
 ;
 
 Faculty:
-	'Fakultaet' name=ID
+	'Fakultaet' completeName=STRING '[' name=ID ']'
 	'Studiengaenge' '['
 		(courses+=CourseOfStudies)*
+	']'
+	'Professoren' '['
+		(professors+=Professor)+
 	']'
 ;
 
 CourseOfStudies:
-	'Studiengang' name=ID
+	'Studiengang' completeName=STRING '[' name=ID ']'
 	('Zulassungsvoraussetzung' requirements+=AdmissionRequirement (',' vals+=AdmissionRequirement)*)?
 	'ECTS' ects=INT
 	'Semester' semester=INT
-	'Abschluss' degree=[glossary::GlossaryEntry|FQN]
+	'Abschluss' degreeClass=[DegreeClass|FQN] 'of' degree=[Degree]
 ;
 
 AdmissionRequirement:

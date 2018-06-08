@@ -41,5 +41,6 @@ Workflow {
 				// composedCheck = "org.eclipse.xtext.validation.NamesAreUniqueValidator"
 			}
 		}
+		
 	}
 }

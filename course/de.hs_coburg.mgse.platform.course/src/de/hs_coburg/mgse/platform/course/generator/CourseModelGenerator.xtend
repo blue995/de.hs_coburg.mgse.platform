@@ -3,13 +3,13 @@
  */
 package de.hs_coburg.mgse.platform.course.generator
 
+import de.hs_coburg.mgse.platform.course.courseModel.CourseOfStudies
+import de.hs_coburg.mgse.platform.course.courseModel.Faculty
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
-import de.hs_coburg.mgse.platform.course.courseModel.Faculty
-import de.hs_coburg.mgse.platform.course.courseModel.CourseOfStudies
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 
 /**
  * Generates code from your model files on save.
@@ -52,7 +52,7 @@ class CourseModelGenerator extends AbstractGenerator {
 			<div>Studiengang: «cos.name»</div>
 			<div>Semester: «cos.semester»</div>
 			<div>ECTS: «cos.ects»</div>
-			«cos.degree.compileHTML»
+			«cos.degree.reference.compileHTML»
 		</div>
 	'''
 	

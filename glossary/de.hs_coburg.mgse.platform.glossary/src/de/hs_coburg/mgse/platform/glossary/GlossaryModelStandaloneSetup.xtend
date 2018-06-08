@@ -3,7 +3,6 @@
  */
 package de.hs_coburg.mgse.platform.glossary
 
-
 /**
  * Initialization support for running Xtext languages without Equinox extension registry.
  */

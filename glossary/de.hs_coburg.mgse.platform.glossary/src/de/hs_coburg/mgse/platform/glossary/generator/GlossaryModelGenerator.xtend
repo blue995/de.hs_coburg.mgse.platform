@@ -3,13 +3,14 @@
  */
 package de.hs_coburg.mgse.platform.glossary.generator
 
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossarySection
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossarySection
+
 /**
  * Generates code from your model files on save.
  * 

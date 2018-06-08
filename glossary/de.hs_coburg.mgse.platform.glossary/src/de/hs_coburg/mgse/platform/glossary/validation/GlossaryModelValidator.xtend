@@ -3,12 +3,12 @@
  */
 package de.hs_coburg.mgse.platform.glossary.validation
 
-import org.eclipse.xtext.validation.Check
-import org.eclipse.xtext.validation.CheckType
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
+import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryModelPackage
 import java.util.LinkedList
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
+import org.eclipse.xtext.validation.Check
+import org.eclipse.xtext.validation.CheckType
 
 /**
  * This class contains custom validation rules. 
