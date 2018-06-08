@@ -10,7 +10,6 @@ import org.eclipse.xtext.generator.IGeneratorContext
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossarySection
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntryInformation
 /**
  * Generates code from your model files on save.
  * 
@@ -157,51 +156,51 @@ class GlossaryModelGenerator extends AbstractGenerator {
 		@Entity(name = "GlossaryEntry")
 		@Table(name = "GLOSSARYENTRY")
 		public class GlossaryEntry {
+			
 			@Id @GeneratedValue
 			@Column(name = "id", nullable = false)
 			private Long id;
-				
-			@Column(name = "word", nullable = false)
-			private String word;
-				
-			@Column(name = "meaning", nullable = false)
-			private String meaning;
-				
-			@Column(name = "abbreviation", nullable = true)
-			private String abbreviation;								
 			
+			«FOR glossaryEntryInformation: ge.information.eClass.EAllAttributes»
+			@Column(name = "«glossaryEntryInformation.name»", nullable = false)
+			«IF glossaryEntryInformation.EAttributeType.name.substring(1) != "String"»
+			private «glossaryEntryInformation.EAttributeType.name.substring(1).toFirstLower» «glossaryEntryInformation.name»;
+			 
+			«ELSE»
+			private «glossaryEntryInformation.EAttributeType.name.substring(1)» «glossaryEntryInformation.name»;
+			
+			«ENDIF»
+			«ENDFOR»
 			//getter and setter
 			public Long getId() {
-		    	return id;
-		   	}
-			   
+				return id;
+			}
+									   
 			public void setId(Long id) {
-		  		id = id;
+				id = id;
 			}
 			
-			public String getWord() {
-				return word;
+			«FOR glossaryEntryInformation: ge.information.eClass.EAllAttributes»
+			«IF glossaryEntryInformation.EAttributeType.name.substring(1) != "String"»
+			public «glossaryEntryInformation.EAttributeType.name.substring(1).toFirstLower» get«glossaryEntryInformation.name.toFirstUpper»() {
+				return «glossaryEntryInformation.name»;
 			}
-
-			public void setWord(String word) {
-				word = word;
+						
+			public void set«glossaryEntryInformation.name.toFirstUpper»(«glossaryEntryInformation.EAttributeType.name.substring(1).toFirstLower» «glossaryEntryInformation.name») {
+				«glossaryEntryInformation.name» = «glossaryEntryInformation.name»;
+			}
+						 
+			«ELSE»						
+			public «glossaryEntryInformation.EAttributeType.name.substring(1)» get«glossaryEntryInformation.name.toFirstUpper»() {
+				return «glossaryEntryInformation.name»;
 			}
 			
-			public String getMeaning() {
-				return meaning;
-			}
-
-			public void setMeaning(String meaning) {
-				meaning = meaning;
+			public void set«glossaryEntryInformation.name.toFirstUpper»(«glossaryEntryInformation.EAttributeType.name.substring(1)» «glossaryEntryInformation.name») {
+				«glossaryEntryInformation.name» = «glossaryEntryInformation.name»;
 			}
 			
-			public String getAbbreviation() {
-				return abbreviation;
-			}
-
-			public void setAbbreviation(String abbreviation) {
-				abbreviation = abbreviation;
-			}
+			«ENDIF»
+			«ENDFOR»
 		}
 	'''
 	
