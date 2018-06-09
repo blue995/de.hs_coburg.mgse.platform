@@ -1,0 +1,9 @@
+grammar de.hs_coburg.mgse.platform.ser.SERModel with org.eclipse.xtext.common.Terminals
+
+generate sERModel "http://www.hs_coburg.de/mgse/platform/ser/SERModel"
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';

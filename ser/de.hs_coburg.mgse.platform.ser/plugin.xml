@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension point="org.eclipse.emf.ecore.generated_package">
+		<package 
+			uri = "http://www.hs_coburg.de/mgse/platform/ser/SERModel"
+			class = "de.hs_coburg.mgse.platform.ser.sERModel.SERModelPackage"
+			genModel = "model/generated/SERModel.genmodel" />
+	</extension>
+</plugin>
