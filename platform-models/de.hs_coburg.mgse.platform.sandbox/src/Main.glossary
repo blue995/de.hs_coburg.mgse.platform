@@ -21,3 +21,15 @@ Section [Abschluesse]
 	meaning: "Bachelorabschluss eines naturwissenschaftlichen Studienganges"
 	abbreviation: "B.Sc."
 End
+
+Section [Allgemein]
+	[SPO]
+	word: "Studien- und Prüfungsordnung"
+	meaning: "Offensichtlich"
+	abbreviation: "SPO"
+	
+	[BayHSchG]
+	word: "Bayerischen Hochschulgesetzes"
+	meaning: "Offensichtlich"
+	abbreviation: "BayHSchG"
+End

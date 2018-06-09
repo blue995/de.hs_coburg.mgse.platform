@@ -1,9 +1,72 @@
 grammar de.hs_coburg.mgse.platform.ser.SERModel with org.eclipse.xtext.common.Terminals
 
 generate sERModel "http://www.hs_coburg.de/mgse/platform/ser/SERModel"
+import 'http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel' as glossary
+import 'http://www.hs_coburg.de/mgse/platform/course/CourseModel' as course
 
 Model:
-	greetings+=Greeting*;
+	ser=StudyExaminationRegulations
+;
+
+StudyExaminationRegulations:
+	'ID' name=ID
+	'Studiengang' course=[course::CourseOfStudies|FQN]
+	'Version' version=INT
+	'Gueltigkeitsdatum' date=DATE
+	'Titel' title=STRING
+	'Vorwort' foreword=STRING
+	'Paragraphen' '['
+		(paragraphs+=Paragraph)*
+	']'
+	'Fussnoten' '['
+		(footnodes+=Footnode)*
+	']'
+;
+
+Footnode:
+	'[' name=ID ']:' text=STRING
+;
+
+Paragraph:
+	'Start'
+		'§' number=INT
+		'Titel' title=STRING
+		((sentences+=Sentence)+ | (subParagraphs+=SubParagraph)+)
+	'Ende'
 	
-Greeting:
-	'Hello' name=ID '!';
+;
+
+SubParagraph:
+	'§§' number=INT
+	(sentences+=Sentence)+
+;
+
+Sentence:
+	'-' text=RichText
+	('[' 'Fussnoten:' footnodes+=[Footnode|FQN] (',' footnodes+=[Footnode|FQN])* ']')?
+;
+
+RichText:
+	(literals+=RichTextLiteral)+
+;
+
+RichTextLiteral:
+	text=STRING | RichTextReference
+;
+
+RichTextReference:
+	reference=[glossary::GlossaryEntry|FQN]
+;
+
+DATE:
+	day=INT '.' month=Month year=INT
+;
+
+enum Month:
+	JANUARY='Januar' 	| FEBRUARY='Februar'	| MARCH='Maerz' |
+	APRIL='April' 		| MAY='Mai' 			| JUNE='Juni' |
+	JULY='Juli'			| AUGUST='August'		| SEPTEMBER='September' |
+	OCTOBER='Oktober'	| NOVEMBER='November'	| DECEMBER='Dezember'
+;
+
+FQN: ID (('.') ID)*;
