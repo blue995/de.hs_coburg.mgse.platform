@@ -9,7 +9,7 @@ Glossary:
 ;
 
 GlossarySection:
-	'Section' '[' name=ID ']'
+	'Section' completeName=STRING '[' name=ID ']'
 		(entries+=GlossaryEntry)*
 	'End'	
 ;
@@ -21,6 +21,6 @@ GlossaryEntry:
 
 GlossaryEntryInformation:
 	'word:' word=STRING
-	'meaning:' meaning=STRING
+	('meaning:' meaning=STRING)?
 	('abbreviation:' abbreviation=STRING)?
 ;

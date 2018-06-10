@@ -33,6 +33,7 @@ Professor:
 		'-' 'Nachname' lastName=STRING
 		'-' 'Email' email=STRING
 		'-' 'Raum' room=STRING
+		'-' 'Kuerzel' abbreviation=[glossary::GlossaryEntry|FQN]
 ;
 
 Faculty:

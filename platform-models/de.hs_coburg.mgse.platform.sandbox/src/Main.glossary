@@ -1,6 +1,6 @@
 glossary Begriffe
 
-Section [Abschluesse]
+Section "Abschlüsse" [Abschluesse]
 	[Master_of_Science]
 	word: "Master of Science"
 	meaning: "Masterabschluss eines naturwissenschaftlichen Studienganges"
@@ -22,21 +22,26 @@ Section [Abschluesse]
 	abbreviation: "B.Sc."
 End
 
-Section [Professoren]
-	[Test]
-	word: "maosd"
-	meaning: "aoisnmda"
-	abbreviation: "daoim"
+Section "Professoren" [profs]
+	[TB]
+	word: "Tobias Blaufuß"
+	abbreviation: "TB"
+	
+	[JEB]
+	word: "Jonathan Emmanuel Braat"
+	abbreviation: "JEB"
+	
+	[HS]
+	word: "Hakan Senkaya"
+	abbreviation: "HS"
 End
 
-Section [Allgemein]
+Section "Allgemein" [general]
 	[SPO]
 	word: "Studien- und Prüfungsordnung"
-	meaning: "Offensichtlich"
 	abbreviation: "SPO"
 	
 	[BayHSchG]
 	word: "Bayerischen Hochschulgesetzes"
-	meaning: "Offensichtlich"
 	abbreviation: "BayHSchG"
 End
