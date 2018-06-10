@@ -16,11 +16,11 @@ StudyExaminationRegulations:
 	'Titel' title=STRING
 	'Vorwort' foreword=STRING
 	'Paragraphen' '['
-		(paragraphs+=Paragraph)*
+		(paragraphs+=Paragraph)+
 	']'
-	'Fussnoten' '['
+	('Fussnoten' '['
 		(footnodes+=Footnode)*
-	']'
+	']')?
 ;
 
 Footnode:
