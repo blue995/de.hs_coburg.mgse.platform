@@ -11,8 +11,8 @@ Model:
 StudyExaminationRegulations:
 	'ID' name=ID
 	'Studiengang' course=[course::CourseOfStudies|FQN]
-	'Version' version=INT
-	'Gueltigkeitsdatum' date=DATE
+	'Version' version=INT // Should be used as Primary Key
+	'Gueltigkeitsdatum' date=DATE // Should be used as Primary Key
 	'Titel' title=STRING
 	'Vorwort' foreword=STRING
 	'Paragraphen' '['
