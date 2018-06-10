@@ -10,6 +10,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import de.hs_coburg.mgse.platform.course.courseModel.Degree
 
 /**
  * Generates code from your model files on save.
@@ -52,10 +53,12 @@ class CourseModelGenerator extends AbstractGenerator {
 			<div>Studiengang: «cos.name»</div>
 			<div>Semester: «cos.semester»</div>
 			<div>ECTS: «cos.ects»</div>
-			«cos.degree.reference.compileHTML»
+			«cos.degree.compileHTML»
 		</div>
 	'''
-	
+	def compileHTML(Degree degree)'''
+		<div>Abschluss: «degree.glossaryEntry.information.word»</div>
+	'''
 	def compileHTML(GlossaryEntry entry)'''
 		<div>Abschluss: «entry.information.word»</div>
 	'''

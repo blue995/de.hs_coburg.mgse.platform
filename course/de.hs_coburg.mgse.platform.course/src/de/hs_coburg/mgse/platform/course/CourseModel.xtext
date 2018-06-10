@@ -6,7 +6,13 @@ import 'http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel' as glossar
 
 
 Model:
-	Faculty | DegreeList
+	Faculty | DegreeList | AdmissionRequirementList
+;
+
+AdmissionRequirementList:
+	'Zulassungsvoraussetzungen' '['
+		(requirements+=AdmissionRequirement)+
+	']'
 ;
 
 DegreeList:
@@ -15,15 +21,22 @@ DegreeList:
 	 	(degreeClasses+=DegreeClass)*
 	 ']'
 	 'Abschlussunterarten' '['
+	 	(subDegrees+=SubDegree)*
+	 ']'
+	 'Abschluesse' '['
 	 	(degrees+=Degree)*
 	 ']'
 ;
 
 DegreeClass:
-	'-' '[' name=ID ']' ('(' completeName=STRING ')')?
+	'-' '[' name=ID ']:' completeName=STRING
 ;
+SubDegree:
+	'-' '[' name=ID ']:' completeName=STRING
+;
+
 Degree:
-	'-' '[' name=ID ']:'reference=[glossary::GlossaryEntry|FQN] 
+	'-' '[' name=ID ']:' degreeClass=[DegreeClass|FQN] 'of' degree=[SubDegree|FQN] ('[Details:' glossaryEntry=[glossary::GlossaryEntry|FQN] ']')?
 ;
 
 Professor:
@@ -48,14 +61,16 @@ Faculty:
 
 CourseOfStudies:
 	'Studiengang' completeName=STRING '[' name=ID ']'
-	('Zulassungsvoraussetzung' requirements+=AdmissionRequirement (',' vals+=AdmissionRequirement)*)?
+	('Zulassungsvoraussetzung' (requirements+=[AdmissionRequirement|FQN])+ (',' requirements+=[AdmissionRequirement|FQN])*)?
 	'ECTS' ects=INT
 	'Semester' semester=INT
-	'Abschluss' degreeClass=[DegreeClass|FQN] 'of' degree=[Degree]
+	'Abschluss' degree=[Degree|FQN]
 ;
 
+
+
 AdmissionRequirement:
-	value+=STRING
+	'-' '[' name=ID ']:' value+=STRING
 ;
 
 FQN: ID (('.') ID)*;

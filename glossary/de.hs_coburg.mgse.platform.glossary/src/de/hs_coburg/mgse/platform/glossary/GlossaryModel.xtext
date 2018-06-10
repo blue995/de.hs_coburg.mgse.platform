@@ -4,14 +4,14 @@ generate glossaryModel "http://www.hs_coburg.de/mgse/platform/glossary/GlossaryM
 
 
 Glossary:
-	'glossary' name = ID
-	(sections+=GlossarySection)*
+	'Glossar' name=ID
+	(sections+=GlossarySection)+
 ;
 
 GlossarySection:
-	'Section' completeName=STRING '[' name=ID ']'
+	'Sektion' completeName=STRING
 		(entries+=GlossaryEntry)*
-	'End'	
+	'Ende'	
 ;
 
 GlossaryEntry:
@@ -20,7 +20,7 @@ GlossaryEntry:
 ;
 
 GlossaryEntryInformation:
-	'word:' word=STRING
-	('meaning:' meaning=STRING)?
-	('abbreviation:' abbreviation=STRING)?
+	'Wort:' word=STRING
+	('Bedeutung:' meaning=STRING)?
+	('Abkuerzung:' abbreviation=STRING)?
 ;

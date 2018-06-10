@@ -1,47 +1,47 @@
-glossary Begriffe
+Glossar Begriffe
 
-Section "Abschlüsse" [Abschluesse]
+Sektion "Abschlüsse"
 	[Master_of_Science]
-	word: "Master of Science"
-	meaning: "Masterabschluss eines naturwissenschaftlichen Studienganges"
-	abbreviation: "M.Sc."
+	Wort: "Master of Science"
+	Bedeutung: "Masterabschluss eines naturwissenschaftlichen Studienganges"
+	Abkuerzung: "M.Sc."
 	
 	[Master_of_Arts]
-	word: "Master of Arts"
-	meaning: "Masterabschluss eines geistes-, kultur-, sozial- oder wirtschaftswissenschaftlichen Studienganges"
-	abbreviation: "M.A."
+	Wort: "Master of Arts"
+	Bedeutung: "Masterabschluss eines geistes-, kultur-, sozial- oder wirtschaftswissenschaftlichen Studienganges"
+	Abkuerzung: "M.A."
 	
 	[Master_of_BA]
-	word: "Master of Business Administration"
-	meaning: "Masterabschluss eines Studienganges, welcher hauptsächlich Managementkompetenzen vermittelt."
-	abbreviation: "MBA"
+	Wort: "Master of Business Administration"
+	Bedeutung: "Masterabschluss eines Studienganges, welcher hauptsächlich Managementkompetenzen vermittelt."
+	Abkuerzung: "MBA"
 		
 	[Bachelor_of_Science]
-	word: "Bachelor of Science"
-	meaning: "Bachelorabschluss eines naturwissenschaftlichen Studienganges"
-	abbreviation: "B.Sc."
-End
+	Wort: "Bachelor of Science"
+	Bedeutung: "Bachelorabschluss eines naturwissenschaftlichen Studienganges"
+	Abkuerzung: "B.Sc."
+Ende
 
-Section "Professoren" [profs]
+Sektion "Professoren"
 	[TB]
-	word: "Tobias Blaufuß"
-	abbreviation: "TB"
+	Wort: "Tobias Blaufuß"
+	Abkuerzung: "TB"
 	
 	[JEB]
-	word: "Jonathan Emmanuel Braat"
-	abbreviation: "JEB"
+	Wort: "Jonathan Emmanuel Braat"
+	Abkuerzung: "JEB"
 	
 	[HS]
-	word: "Hakan Senkaya"
-	abbreviation: "HS"
-End
+	Wort: "Hakan Senkaya"
+	Abkuerzung: "HS"
+Ende
 
-Section "Allgemein" [general]
+Sektion "Allgemein"
 	[SPO]
-	word: "Studien- und Prüfungsordnung"
-	abbreviation: "SPO"
+	Wort: "Studien- und Prüfungsordnung"
+	Abkuerzung: "SPO"
 	
 	[BayHSchG]
-	word: "Bayerischen Hochschulgesetzes"
-	abbreviation: "BayHSchG"
-End
+	Wort: "Bayerischen Hochschulgesetzes"
+	Abkuerzung: "BayHSchG"
+Ende

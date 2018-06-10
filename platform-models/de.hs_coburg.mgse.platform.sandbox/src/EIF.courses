@@ -4,12 +4,12 @@ Studiengaenge [
 	Studiengang "Informatik" [IF_B]
 	ECTS 210
 	Semester 7
-	Abschluss Bachelor of Science
+	Abschluss BSc
 	
 	Studiengang "Informatik" [IF_M]
 	ECTS 90
 	Semester 3
-	Abschluss Master of Science
+	Abschluss MSc
 ]
 
 Professoren [
@@ -18,7 +18,7 @@ Professoren [
 	- Nachname "Blaufuß"
 	- Email "tobias.blaufuss@stud.hs-coburg.de"
 	- Raum "Oben"
-	- Kuerzel Begriffe.profs.TB
+	- Kuerzel Begriffe.TB
 	
 	Professor [JEB]
 	- Vorname "Jonathan"
@@ -26,14 +26,14 @@ Professoren [
 	- Nachname "Braat"
 	- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
 	- Raum "links"
-	- Kuerzel Begriffe.profs.JEB
+	- Kuerzel Begriffe.JEB
 	
 	Professor [HS]
 	- Vorname "Hakan"
 	- Nachname "Senkaya"
 	- Email "hakan.senkaya@stud.hs-coburg.de"
 	- Raum "Noch weiter oben"
-	- Kuerzel Begriffe.profs.HS
+	- Kuerzel Begriffe.HS
 ]
 
 

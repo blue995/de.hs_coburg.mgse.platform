@@ -1,7 +1,11 @@
 Abschlussarten [
-	- [Bachelor]
-	- [Master]
+	- [Bachelor]: "Bachelor"
+	- [Master]: "Master"
 ]
 Abschlussunterarten [
-	- [Science]: Begriffe.Abschluesse.Bachelor_of_Science
+	- [Science]: "Science"
+]
+Abschluesse [
+	- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+	- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
 ]

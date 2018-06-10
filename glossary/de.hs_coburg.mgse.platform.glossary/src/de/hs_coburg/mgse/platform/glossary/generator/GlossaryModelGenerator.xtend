@@ -79,7 +79,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 	
 	def compileHTML(GlossarySection glossarySection)'''
 		<div class="glossary__section-header">
-			«glossarySection.name»
+			«glossarySection.completeName»
 		</div>
 		<table class="table table-striped table-hover table-sm">
 		<thead>
