@@ -19,11 +19,11 @@ StudyExaminationRegulations:
 		(paragraphs+=Paragraph)+
 	']'
 	('Fussnoten' '['
-		(footnodes+=Footnode)*
+		(footnotes+=Footnote)*
 	']')?
 ;
 
-Footnode:
+Footnote:
 	'[' name=ID ']:' text=STRING
 ;
 
@@ -43,7 +43,7 @@ SubParagraph:
 
 Sentence:
 	'-' text=RichText
-	('[' 'Fussnoten:' footnodes+=[Footnode|FQN] (',' footnodes+=[Footnode|FQN])* ']')?
+	('[' 'Fussnoten:' footnotes+=[Footnote|FQN] (',' footnotes+=[Footnote|FQN])* ']')?
 ;
 
 RichText:
