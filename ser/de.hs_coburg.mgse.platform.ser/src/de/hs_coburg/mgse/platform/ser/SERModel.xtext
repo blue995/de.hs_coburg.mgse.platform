@@ -5,7 +5,7 @@ import 'http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel' as glossar
 import 'http://www.hs_coburg.de/mgse/platform/course/CourseModel' as course
 
 Model:
-	ser=StudyExaminationRegulations
+	StudyExaminationRegulations | ExamTypeDeclaration | ExamTypeDeclaration
 ;
 
 StudyExaminationRegulations:
@@ -21,6 +21,41 @@ StudyExaminationRegulations:
 	('Fussnoten' '['
 		(footnotes+=Footnote)*
 	']')?
+	'Studienabschnitte' '['
+		(studySections+=StudySection)+
+	']'
+;
+
+StudySection:
+	'Startsemester' firstSemester=INT
+	'Endsemester' lastSemester=INT
+	'Bezeichnung' completeName=STRING
+	'Module' '['
+		(modules+=Module)+
+	']'
+;
+
+Module:
+	'Bezeichnung' completeName=STRING
+	'ECTS' ects=INT
+	'Gewichtung' quantifier=DOUBLE
+	'SWS' semesterHours=INT
+	'Modulart' moduleType=STRING
+	(('Details' details=[glossary::GlossaryEntry|FQN]) | ('Anzahl' count=INT))
+	'Pruefungsart' '['
+		(examTypes+=ExamType)*
+	']'
+;
+
+ExamType:
+	'ExamTypeDeclaration' examTypeDeclaration=ExamTypeDeclaration
+	'Von' lowerBound=INT
+	'Bis' upperBound=INT
+;
+
+ExamTypeDeclaration:
+	'Einheit' unit=STRING
+	'Details' details=[glossary::GlossaryEntry|FQN]
 ;
 
 Footnote:
@@ -70,3 +105,5 @@ enum Month:
 ;
 
 FQN: ID (('.') ID)*;
+
+DOUBLE: INT (('.') INT)?;
