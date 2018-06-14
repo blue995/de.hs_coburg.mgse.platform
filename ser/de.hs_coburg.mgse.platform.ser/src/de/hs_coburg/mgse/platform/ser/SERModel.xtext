@@ -48,7 +48,7 @@ Module:
 ;
 
 ExamType:
-	'ExamTypeDeclaration' examTypeDeclaration=ExamTypeDeclaration
+	'ExamTypeDeclaration' examTypeDeclaration=[ExamTypeDeclaration|FQN]
 	'Von' lowerBound=INT
 	'Bis' upperBound=INT
 ;
