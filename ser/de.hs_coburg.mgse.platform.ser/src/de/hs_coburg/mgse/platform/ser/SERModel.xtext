@@ -5,7 +5,7 @@ import 'http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel' as glossar
 import 'http://www.hs_coburg.de/mgse/platform/course/CourseModel' as course
 
 Model:
-	StudyExaminationRegulations | ExamTypeDeclaration
+	StudyExaminationRegulations | Module | ExamType | ExamTypeDeclaration
 ;
 
 StudyExaminationRegulations:
@@ -31,8 +31,8 @@ StudySection:
 	'Endsemester' lastSemester=INT
 	'Bezeichnung' completeName=STRING
 	'Modules' '['
-		(modules+=Module)+
-	']'
+		(modules+=[Module|FQN])+
+	']' 
 ;
 
 Module:
@@ -42,13 +42,13 @@ Module:
 	'SWS' semesterHours=INT
 	'Modulart' moduleType=STRING
 	(('Details' details=[glossary::GlossaryEntry|FQN]) | ('Anzahl' count=INT))
-	'Pruefungsart' '['
-		(examTypes+=ExamType)*
+	'Pruefungsarten' '['
+		(examTypes+=[ExamType|FQN])*
 	']'
 ;
 
-ExamType:
-	'ExamTypeDeclaration' examTypeDeclaration=[ExamTypeDeclaration|FQN]
+ExamType: 
+	'Pruefungsart' examTypeDeclaration=[ExamTypeDeclaration|FQN]
 	'Von' lowerBound=INT
 	'Bis' upperBound=INT
 ;

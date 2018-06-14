@@ -88,5 +88,7 @@ Studienabschnitte [
 	Startsemester 1
 	Endsemester 2
 	Bezeichnung "Theoretisches Fachsemester"
-	Module
+	Modules [
+		Bezeichnung 
+	]   
 ]
