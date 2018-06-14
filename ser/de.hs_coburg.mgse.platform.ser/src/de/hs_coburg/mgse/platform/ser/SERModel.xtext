@@ -36,7 +36,7 @@ StudySection:
 ;
 
 Module:
-	'Bezeichnung' completeName=STRING
+	'Name' name=ID
 	'ECTS' ects=INT
 	'Gewichtung' quantifier=DOUBLE
 	'SWS' semesterHours=INT
@@ -47,15 +47,17 @@ Module:
 	']'
 ;
 
-ExamType: 
+ExamType:
+	'Name' name=ID
 	'Pruefungsart' examTypeDeclaration=[ExamTypeDeclaration|FQN]
 	'Von' lowerBound=INT
 	'Bis' upperBound=INT
 ;
 
 ExamTypeDeclaration:
-	'Einheit' unit=STRING
+	'Typ' name=ID
 	'Details' details=[glossary::GlossaryEntry|FQN]
+	'Einheit' unit=STRING
 ;
 
 Footnote:
