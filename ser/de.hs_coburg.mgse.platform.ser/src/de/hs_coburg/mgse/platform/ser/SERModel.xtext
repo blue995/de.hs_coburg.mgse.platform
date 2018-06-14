@@ -30,7 +30,7 @@ StudySection:
 	'Startsemester' firstSemester=INT
 	'Endsemester' lastSemester=INT
 	'Bezeichnung' completeName=STRING
-	'Module' '['
+	'Modules' '['
 		(modules+=Module)+
 	']'
 ;

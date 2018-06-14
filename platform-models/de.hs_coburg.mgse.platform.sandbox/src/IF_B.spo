@@ -84,3 +84,9 @@ Fussnoten [
 			erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
 			der Studien- und Prüfungsplan."
 ]
+Studienabschnitte [
+	Startsemester 1
+	Endsemester 2
+	Bezeichnung "Theoretisches Fachsemester"
+	Module
+]
