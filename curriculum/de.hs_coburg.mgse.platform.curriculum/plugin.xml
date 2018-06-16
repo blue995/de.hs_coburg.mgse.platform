@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension point="org.eclipse.emf.ecore.generated_package">
+		<package 
+			uri = "http://www.hs_coburg.de/mgse/platform/curriculum/CurriculumModel"
+			class = "de.hs_coburg.mgse.platform.curriculum.curriculumModel.CurriculumModelPackage"
+			genModel = "model/generated/CurriculumModel.genmodel" />
+	</extension>
+</plugin>

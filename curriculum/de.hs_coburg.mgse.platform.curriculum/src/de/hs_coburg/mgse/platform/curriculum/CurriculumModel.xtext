@@ -1,0 +1,11 @@
+grammar de.hs_coburg.mgse.platform.curriculum.CurriculumModel with org.eclipse.xtext.common.Terminals
+
+generate curriculumModel "http://www.hs_coburg.de/mgse/platform/curriculum/CurriculumModel"
+import 'http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel' as glossary
+import 'http://www.hs_coburg.de/mgse/platform/ser/SERModel' as ser
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';
