@@ -2,3 +2,4 @@ glossary
 course
 ser
 curriculum
+modulehandbook

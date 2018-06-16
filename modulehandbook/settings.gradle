@@ -1,0 +1,15 @@
+include 'de.hs_coburg.mgse.platform.modulehandbook'
+include 'de.hs_coburg.mgse.platform.modulehandbook.ide'
+include 'de.hs_coburg.mgse.platform.modulehandbook.tests'
+
+include 'de.hs_coburg.mgse.platform.glossary'
+project(':de.hs_coburg.mgse.platform.glossary').projectDir = file('../glossary/de.hs_coburg.mgse.platform.glossary')
+
+include 'de.hs_coburg.mgse.platform.course'
+project(':de.hs_coburg.mgse.platform.course').projectDir = file('../course/de.hs_coburg.mgse.platform.course')
+
+include 'de.hs_coburg.mgse.platform.ser'
+project(':de.hs_coburg.mgse.platform.ser').projectDir = file('../ser/de.hs_coburg.mgse.platform.ser')
+
+include 'de.hs_coburg.mgse.platform.curriculum'
+project(':de.hs_coburg.mgse.platform.curriculum').projectDir = file('../curriculum/de.hs_coburg.mgse.platform.curriculum')
