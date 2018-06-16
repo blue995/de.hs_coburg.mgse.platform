@@ -50,3 +50,10 @@ Sektion "Module"
 	[Prog1]
 	Wort: "Programmieren 1"
 	Abkuerzung: "Prog1"
+Ende
+
+Sektion "Prüfungsarten"
+	[schrPr]
+	Wort: "Schriftliche Prüfung"
+	Abkuerzung: "schrPr"
+Ende

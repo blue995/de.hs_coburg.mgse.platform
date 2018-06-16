@@ -5,11 +5,11 @@ import 'http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel' as glossar
 import 'http://www.hs_coburg.de/mgse/platform/course/CourseModel' as course
 
 Model:
-	StudyExaminationRegulations | Module | ExamType | ExamTypeDeclaration
+	StudyExaminationRegulations | Module | ExamTypeDeclarationList
 ;
 
 StudyExaminationRegulations:
-	'ID' name=ID
+	'SPO' name=ID
 	'Studiengang' course=[course::CourseOfStudies|FQN]
 	'Version' version=INT // Should be used as Primary Key
 	'Gueltigkeitsdatum' date=DATE // Should be used as Primary Key
@@ -36,28 +36,33 @@ StudySection:
 ;
 
 Module:
-	'Name' name=ID
+	'Modul' name=ID
 	'ECTS' ects=INT
 	'Gewichtung' quantifier=DOUBLE
 	'SWS' semesterHours=INT
 	'Modulart' moduleType=STRING
 	(('Details' details=[glossary::GlossaryEntry|FQN]) | ('Anzahl' count=INT))
 	'Pruefungsarten' '['
-		(examTypes+=[ExamType|FQN])*
+		(examTypes+=ExamType)+
 	']'
 ;
 
 ExamType:
 	'Name' name=ID
 	'Pruefungsart' examTypeDeclaration=[ExamTypeDeclaration|FQN]
-	'Von' lowerBound=INT
-	'Bis' upperBound=INT
+	'[' lowerBound=INT ('bis' upperBound=INT)? ']'
 ;
 
 ExamTypeDeclaration:
 	'Typ' name=ID
 	'Details' details=[glossary::GlossaryEntry|FQN]
 	'Einheit' unit=STRING
+;
+
+ExamTypeDeclarationList:
+	'Pruefungsarten' '['
+		(examTypeDeclarations+=ExamTypeDeclaration)+
+	']'
 ;
 
 Footnote:

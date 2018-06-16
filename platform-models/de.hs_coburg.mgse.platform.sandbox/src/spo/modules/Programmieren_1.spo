@@ -1,0 +1,10 @@
+Modul Prog1
+ECTS 6
+Gewichtung 2.2
+SWS 9
+Modulart "Pflichtmodul"
+Details Begriffe.Prog1
+Pruefungsarten [
+	Name schrPr
+	Pruefungsart schrPr [ 90 bis 120 ]
+]
