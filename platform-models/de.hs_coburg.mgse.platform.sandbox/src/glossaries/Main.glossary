@@ -45,3 +45,8 @@ Sektion "Allgemein"
 	Wort: "Bayerischen Hochschulgesetzes"
 	Abkuerzung: "BayHSchG"
 Ende
+
+Sektion "Module"
+	[Prog1]
+	Wort: "Programmieren 1"
+	Abkuerzung: "Prog1"
