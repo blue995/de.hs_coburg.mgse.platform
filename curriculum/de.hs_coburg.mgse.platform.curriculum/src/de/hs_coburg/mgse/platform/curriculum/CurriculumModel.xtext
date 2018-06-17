@@ -6,7 +6,50 @@ import 'http://www.hs_coburg.de/mgse/platform/course/CourseModel' as course
 import 'http://www.hs_coburg.de/mgse/platform/ser/SERModel' as ser
 
 Model:
-	greetings+=Greeting*;
-	
-Greeting:
-	'Hello' name=ID '!';
+	Curriculum | AidList;
+
+Curriculum:
+	'Studienplan' '[' name=ID ']:' completeName=STRING
+	'SPO' ser=[ser::StudyExaminationRegulations|FQN] 
+	'Version' version=INT
+	'Semester' semester=Semester year=INT
+	'Eintraege' '['
+		(curriculumEntries+=CurriculumEntry)+
+	']'
+;
+
+CurriculumEntry:
+	'Eintrag' '[' name=ID ']'
+	'-' 'Modul' module=[ser::Module]
+	'-' 'Turnus' rota=Rota
+	('-' 'Konkreter_Name' completeName=STRING
+	'-' 'Details' details=[glossary::GlossaryEntry|FQN])?
+	'-' 'Leistungsnachweis' (concreteExamTypes+=ConrecteExamType) (',' concreteExamTypes+=ConrecteExamType)*
+	'-' 'Lehrveranstaltungsart' (courseTypes+=[ser::CourseTypeDeclaration|FQN]) (',' courseTypes+=[ser::CourseTypeDeclaration|FQN])*
+	('-' 'Hilfsmittel' ((customAids+=STRING)|(aids+=[Aid|FQN])) (',' ((customAids+=STRING)|(aids+=[Aid|FQN])))*)?
+	'-' 'Pruefer' (testers+=[course::Professor|FQN]) (',' testers+=[course::Professor|FQN])*
+;
+
+Aid:
+	'-' '[' name=ID ']:' completeName=STRING
+;
+
+AidList:
+	'Hilfsmittel' '['
+		(aidDefinitions+=Aid)+
+	']'
+;
+
+ConrecteExamType:
+	examType=[ser::ExamType|FQN] '(' value=INT ')'
+;
+
+enum Semester:
+	SUMMER_SEMESTER='Sommersemester' 	| WINTER_SEMESTER='Wintersemester'
+;
+
+enum Rota:
+	YEARLY='jährlich' | HALF_YEARLY='halbjährlich'
+;
+
+FQN: ID (('.') ID)*;

@@ -57,3 +57,21 @@ Sektion "Prüfungsarten"
 	Wort: "Schriftliche Prüfung"
 	Abkuerzung: "schrPr"
 Ende
+
+Sektion "Lehrveranstaltungsarten"
+	[UE]
+	Wort: "Übung"
+	Abkuerzung: "Ü"
+
+	[V]
+	Wort: "Lehrvortrag"
+	Abkuerzung: "V"
+	
+	[SU]
+	Wort: "Seminaristischer Unterricht"
+	Abkuerzung: "SU"
+	
+	[Pr]
+	Wort: "Praktikum"
+	Abkuerzung: "Pr"
+Ende

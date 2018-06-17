@@ -1,0 +1,13 @@
+Lehrveranstaltungsarten [
+	Typ SU // Seminaristischer Unterricht
+	Details Begriffe.SU
+	
+	Typ UE // Übung
+	Details Begriffe.UE
+	
+	Typ V // Lehrvortrag
+	Details Begriffe.V
+	
+	Typ Pr // Praktikum
+	Details Begriffe.Pr
+]

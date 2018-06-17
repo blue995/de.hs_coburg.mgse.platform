@@ -8,3 +8,6 @@ Pruefungsarten [
 	Name schrPr
 	Pruefungsart schrPr [ 90 bis 120 ]
 ]
+Lehrveranstaltungsarten[
+	Pr, SU, UE, V
+]

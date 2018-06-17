@@ -5,7 +5,18 @@ import 'http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel' as glossar
 import 'http://www.hs_coburg.de/mgse/platform/course/CourseModel' as course
 
 Model:
-	StudyExaminationRegulations | Module | ExamTypeDeclarationList
+	StudyExaminationRegulations | Module | ExamTypeDeclarationList | CourseTypeDeclarationList
+;
+
+CourseTypeDeclarationList:
+	'Lehrveranstaltungsarten' '['
+		(courseTypeDeclarations+=CourseTypeDeclaration)+
+	']'
+;
+
+CourseTypeDeclaration:
+	'Typ' name=ID
+	'Details' details=[glossary::GlossaryEntry|FQN]
 ;
 
 StudyExaminationRegulations:
@@ -19,7 +30,7 @@ StudyExaminationRegulations:
 		(paragraphs+=Paragraph)+
 	']'
 	('Fussnoten' '['
-		(footnotes+=Footnote)*
+		(footnotes+=Footnote)+
 	']')?
 	'Studienabschnitte' '['
 		(studySections+=StudySection)+
@@ -44,6 +55,9 @@ Module:
 	(('Details' details=[glossary::GlossaryEntry|FQN]) | ('Anzahl' count=INT))
 	'Pruefungsarten' '['
 		(examTypes+=ExamType)+
+	']'
+	'Lehrveranstaltungsarten' '['
+		(courseTypes+=[CourseTypeDeclaration|FQN]) (',' (courseTypes+=[CourseTypeDeclaration|FQN]))*
 	']'
 ;
 
