@@ -18,6 +18,10 @@ import org.eclipse.xtext.generator.IGeneratorContext
  */
 class GlossaryModelGenerator extends AbstractGenerator {
 
+	private int  g_counter = 0;
+	private int gs_counter = 0;
+	private int ge_counter = 0;
+
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		for(e: resource.allContents.toIterable.filter(Glossary)) {
 			fsa.generateFile(
@@ -27,6 +31,10 @@ class GlossaryModelGenerator extends AbstractGenerator {
 			fsa.generateFile(
 				e.name.toLowerCase() + ".css",
 				compileCSS
+			)
+			fsa.generateFile(
+				"GlossaryModelCreator.java",
+            	e.compileModelCreatorGlossary
 			)
 		}
 		for(e: resource.allContents.toIterable.filter(GlossarySection)) {
@@ -42,6 +50,67 @@ class GlossaryModelGenerator extends AbstractGenerator {
             )
 		}
 	}
+	
+	def compileModelCreatorGlossary(Glossary g)'''
+		package de.hs_coburg.mgse.modelcreator;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		import java.util.ArrayList;
+		import java.util.List;
+		
+		import de.hs_coburg.mgse.persistence.model.Glossary;
+		import de.hs_coburg.mgse.persistence.model.GlossaryEntry;
+		import de.hs_coburg.mgse.persistence.model.GlossarySection;
+		
+		public class GlossaryModelCreator {
+		    public static boolean createModel() {
+		        boolean resp = true;
+		        try {
+		            EntityManager em = HibernateUtil.getEntityManager();
+		            em.getTransaction().begin();
+		
+					Glossary g = new Glossary();
+					List<GlossarySection> l_gs = new ArrayList<GlossarySection>();
+					
+					«FOR gs: g.sections»
+						GlossarySection gs_«gs_counter» = new GlossarySection();
+						List<GlossaryEntry> l_ge_«gs_counter» = new ArrayList<GlossaryEntry>();
+						
+						«FOR ge: gs.entries»
+							GlossaryEntry ge_«ge_counter» = new GlossaryEntry();
+							ge_«ge_counter».setWord("«ge.information.word»");
+							ge_«ge_counter».setMeaning("«ge.information.meaning»");
+							ge_«ge_counter».setAbbreviation("«ge.information.abbreviation»");
+							l_ge_«gs_counter».add(ge_«ge_counter»);
+							//«ge_counter++»
+						«ENDFOR»
+						
+						gs_«gs_counter».setEntries(l_ge_«gs_counter»);
+						gs_«gs_counter».setCompleteName("«gs.name»");
+						
+						l_gs.add(gs_«gs_counter»);
+						//«gs_counter++»
+					«ENDFOR»
+					
+					g.setSections(l_gs);
+					em.persist(g);
+					
+		            //commit and close Transaction
+		            em.getTransaction().commit();
+		            em.close();
+		        } catch(Exception e) {
+		            e.printStackTrace();
+		            resp = false;
+		        }
+		        return resp;
+		    }
+		}
+	'''
+	
+	def compileModelCreatorGlossarySection(GlossarySection gs) '''
+	
+	'''
 	
 	def compileHTML(Glossary glossary)'''
 		<!DOCTYPE html>
@@ -204,5 +273,6 @@ class GlossaryModelGenerator extends AbstractGenerator {
 			«ENDFOR»
 		}
 	'''
+	
 	
 }
