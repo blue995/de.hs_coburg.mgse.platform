@@ -20,14 +20,18 @@ Curriculum:
 
 CurriculumEntry:
 	'Eintrag' '[' name=ID ']'
-	'-' 'Modul' module=[ser::Module]
 	'-' 'Turnus' rota=Rota
+	moduleSpecification=ModuleSpecification
+	('-' 'Hilfsmittel' ((customAids+=STRING)|(aids+=[Aid|FQN])) (',' ((customAids+=STRING)|(aids+=[Aid|FQN])))*)?
+	'-' 'Pruefer' (testers+=[course::Professor|FQN]) (',' testers+=[course::Professor|FQN])*
+;
+
+ModuleSpecification:
+	'-' 'Modul' module=[ser::Module]
 	('-' 'Konkreter_Name' completeName=STRING
 	'-' 'Details' details=[glossary::GlossaryEntry|FQN])?
 	'-' 'Leistungsnachweis' (concreteExamTypes+=ConrecteExamType) (',' concreteExamTypes+=ConrecteExamType)*
 	'-' 'Lehrveranstaltungsart' (courseTypes+=[ser::CourseTypeDeclaration|FQN]) (',' courseTypes+=[ser::CourseTypeDeclaration|FQN])*
-	('-' 'Hilfsmittel' ((customAids+=STRING)|(aids+=[Aid|FQN])) (',' ((customAids+=STRING)|(aids+=[Aid|FQN])))*)?
-	'-' 'Pruefer' (testers+=[course::Professor|FQN]) (',' testers+=[course::Professor|FQN])*
 ;
 
 Aid:
