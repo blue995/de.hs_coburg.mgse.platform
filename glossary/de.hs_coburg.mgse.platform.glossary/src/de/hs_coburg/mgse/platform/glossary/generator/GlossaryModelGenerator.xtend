@@ -87,7 +87,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 						«ENDFOR»
 						
 						gs_«gs_counter».setEntries(l_ge_«gs_counter»);
-						gs_«gs_counter».setCompleteName("«gs.name»");
+						gs_«gs_counter».setCompleteName("«gs.completeName»");
 						
 						l_gs.add(gs_«gs_counter»);
 						//«gs_counter++»
