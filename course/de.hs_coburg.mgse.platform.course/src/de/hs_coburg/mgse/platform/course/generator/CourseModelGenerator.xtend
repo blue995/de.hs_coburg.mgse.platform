@@ -5,12 +5,15 @@ package de.hs_coburg.mgse.platform.course.generator
 
 import de.hs_coburg.mgse.platform.course.courseModel.CourseOfStudies
 import de.hs_coburg.mgse.platform.course.courseModel.Faculty
+import de.hs_coburg.mgse.platform.course.courseModel.Degree
+import de.hs_coburg.mgse.platform.course.courseModel.DegreeList
+import de.hs_coburg.mgse.platform.course.courseModel.SubDegree
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
-import de.hs_coburg.mgse.platform.course.courseModel.Degree
+
 
 /**
  * Generates code from your model files on save.
@@ -19,6 +22,17 @@ import de.hs_coburg.mgse.platform.course.courseModel.Degree
  */
 class CourseModelGenerator extends AbstractGenerator {
 
+	//counter for compileModelCreatorDegree
+	private int dl_counter = 0;
+	private int d_counter = 0;
+	private int dc_counter = 0;
+	private int sd_counter = 0;
+	
+	//counter for compileModelCreatorFaculty
+	private int c_counter = 0;
+	private int cos_counter = 0;
+	private int p_counter = 0;
+
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		for(e: resource.allContents.toIterable.filter(Faculty)) {
 			fsa.generateFile(
@@ -26,7 +40,147 @@ class CourseModelGenerator extends AbstractGenerator {
 				e.compileHTML
 			)
 		}
+		for(e: resource.allContents.toIterable.filter(DegreeList)) {
+			fsa.generateFile(
+				"DegreeModel"+(dl_counter++).toString()+"Creator.java",
+            	e.compileModelCreatorDegree
+			)
+		}
+		for(e: resource.allContents.toIterable.filter(Faculty)) {
+			fsa.generateFile(
+				"CourseModel"+(c_counter)+"Creator.java",
+            	e.compileModelCreatorCourse
+			)
+		}	
 	}
+	
+	def compileModelCreatorCourse(Faculty f)'''
+		package de.hs_coburg.mgse.modelcreator;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		import java.util.ArrayList;
+		import java.util.List;
+		
+		import de.hs_coburg.mgse.persistence.model.Faculty;
+		import de.hs_coburg.mgse.persistence.model.CourseOfStudies;
+		import de.hs_coburg.mgse.persistence.model.Professor;
+		import de.hs_coburg.mgse.persistence.model.Degree;
+		import de.hs_coburg.mgse.persistence.model.GlossaryEntry;
+		
+		public class CourseModel«c_counter++»Creator {
+		    public boolean createModel() {
+		        boolean resp = true;
+		        try {
+		            EntityManager em = HibernateUtil.getEntityManager();
+		            em.getTransaction().begin();
+		            
+					//Implement me
+					Faculty f = new Faculty();
+					f.setCompleteName("«f.completeName»");
+					List<CourseOfStudies> l_cos = new ArrayList<CourseOfStudies>();
+					List<Professor> l_p = new ArrayList<Professor>();
+					
+					«FOR cos: f.courses»
+					CourseOfStudies cos«cos_counter» = new CourseOfStudies();
+					cos«cos_counter».setCompleteName("«cos.completeName»");
+					cos«cos_counter».setEcts(«cos.ects»);
+					cos«cos_counter».setSemester(«cos.semester»);
+					Degree d«cos_counter» = (Degree) em.createQuery("SELECT d FROM Degree d WHERE d.degreeClass.completeName = '«cos.degree.degreeClass.completeName»' AND d.subDegree.completeName = '«cos.degree.degree.completeName»'").getSingleResult();
+					cos«cos_counter».setDegree(d«cos_counter»);
+					l_cos.add(cos«cos_counter++»);
+					//persist?
+					
+					«ENDFOR»
+					«FOR p: f.professors»
+					Professor p«p_counter» = new Professor();
+					p«p_counter».setFirstName("«p.firstName»");
+					p«p_counter».setMiddleName("«p.middleName»");
+					p«p_counter».setLastName("«p.lastName»");
+					p«p_counter».setRoom("«p.room»");
+					p«p_counter».setEmail("«p.email»");
+					GlossaryEntry ge«p_counter» = (GlossaryEntry) em.createQuery("SELECT ge FROM GlossaryEntry ge WHERE ge.abbreviation = '«p.abbreviation.information.abbreviation»' AND ge.word = '«p.abbreviation.information.word»' AND ge.meaning = '«p.abbreviation.information.meaning»' ").getSingleResult();
+					p«p_counter».setAbbreviation(ge«p_counter»);
+					l_p.add(p«p_counter++»);
+					//persist?
+					
+					«ENDFOR»
+					f.setProfessors(l_p);
+					f.setCourseOfStudies(l_cos);
+					em.persist(f);
+		           	
+		          	em.getTransaction().commit();
+		         	//em.close();
+				} catch(Exception e) {
+					e.printStackTrace();
+					resp = false;
+				}
+				return resp;
+			}
+		}
+		
+		
+		«f.professors»
+		«f.courses»
+	'''
+	
+	def compileModelCreatorDegree(DegreeList dl) '''
+		package de.hs_coburg.mgse.modelcreator;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		import java.util.ArrayList;
+		import java.util.List;
+		
+		import de.hs_coburg.mgse.persistence.model.Degree;
+		import de.hs_coburg.mgse.persistence.model.DegreeClass;
+		import de.hs_coburg.mgse.persistence.model.SubDegree;
+		import de.hs_coburg.mgse.persistence.model.GlossaryEntry;
+		
+		public class DegreeModelCreator {
+		    public boolean createModel() {
+		        boolean resp = true;
+		        try {
+		            EntityManager em = HibernateUtil.getEntityManager();
+		            em.getTransaction().begin();
+		            
+		            «FOR dc: dl.degreeClasses»
+		            	DegreeClass dc«dc_counter» = new DegreeClass();
+		            	dc«dc_counter».setCompleteName("«dc.name»");
+		            	em.persist(dc«dc_counter++»);
+		            	
+		            «ENDFOR»
+		            
+		            «FOR sd: dl.subDegrees»
+		            	SubDegree sd«sd_counter» = new SubDegree();
+		            	sd«sd_counter».setCompleteName("«sd.name»");
+		            	em.persist(sd«sd_counter++»);
+		            	
+		            «ENDFOR»
+		            
+		            «FOR d: dl.degrees»
+		            	Degree d«d_counter» = new Degree();
+		            	GlossaryEntry ge«d_counter» = (GlossaryEntry) em.createQuery("SELECT ge FROM GlossaryEntry ge WHERE ge.abbreviation = '«d.glossaryEntry.information.abbreviation»' AND ge.meaning = '«d.glossaryEntry.information.meaning»' AND ge.word = '«d.glossaryEntry.information.word»'").getSingleResult();
+		            	SubDegree sd_«d_counter» = (SubDegree) em.createQuery("SELECT sd FROM SubDegree sd WHERE sd.completeName = '«d.degree.completeName»'").getSingleResult();
+		            	DegreeClass dc_«d_counter» = (DegreeClass) em.createQuery("SELECT dc FROM DegreeClass dc WHERE dc.completeName = '«d.degreeClass.completeName»'").getSingleResult();
+		            	d«d_counter».setGlossaryEntry(ge«d_counter»);
+		            	d«d_counter».setDegreeClass(dc_«d_counter»);
+		            	d«d_counter».setSubDegree(sd_«d_counter»);
+		            	em.persist(d«d_counter++»);
+		            	//courseOfStudies missing
+		            	
+		            «ENDFOR»
+		           	
+		          	em.getTransaction().commit();
+		         	//em.close();
+				} catch(Exception e) {
+					e.printStackTrace();
+					resp = false;
+				}
+				return resp;
+			}
+		}
+	'''
 	
 	def compileHTML(Faculty faculty)'''
 		<!DOCTYPE html>

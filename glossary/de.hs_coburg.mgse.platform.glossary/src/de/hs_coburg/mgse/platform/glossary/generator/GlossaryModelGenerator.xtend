@@ -33,7 +33,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 				compileCSS
 			)
 			fsa.generateFile(
-				"GlossaryModelCreator.java",
+				"Glossary"+(g_counter++).toString()+"ModelCreator.java",
             	e.compileModelCreatorGlossary
 			)
 		}
