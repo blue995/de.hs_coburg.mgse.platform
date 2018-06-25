@@ -10,6 +10,8 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import java.util.Collection
+import java.util.LinkedList
 
 /**
  * Generates code from your model files on save.
@@ -21,10 +23,22 @@ class GlossaryModelGenerator extends AbstractGenerator {
 	private int g_counter = 0;
 	private int gs_counter = 0;
 	private int ge_counter = 0;
+	private Collection<Glossary> toVisit
+	
+	new(){
+		toVisit = null
+	}
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		//implement me
-		fsa.generateFile("GlossaryModelCreator.java", compileGlossaries(resource, fsa, context))
+		// First iteration
+		if(toVisit === null){
+			val allGlossariesToGenerate = resource.resourceSet.resources.map[r | r.allContents.toIterable.filter(Glossary)].flatten
+			println("Generate: " + allGlossariesToGenerate)
+			toVisit = new LinkedList<Glossary>
+			toVisit.addAll(allGlossariesToGenerate)
+			fsa.generateFile("GlossaryModelCreator.java", compileGlossaries(toVisit))
+		} 
+		
 		
 		for(e: resource.allContents.toIterable.filter(Glossary)) {
 			fsa.generateFile(
@@ -55,7 +69,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 		}
 	}
 	
-	def compileGlossaries(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context)'''
+	def compileGlossaries(Collection<Glossary> glossaries)'''
 		package de.hs_coburg.mgse.modelcreator;
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
@@ -70,14 +84,6 @@ class GlossaryModelGenerator extends AbstractGenerator {
 		public class GlossaryModelCreator {
 		    public static boolean createModel() {
 		        boolean resp = true;
-				
-				«FOR e: resource.allContents.toIterable.filter(Glossary)»
-					blabla
-					resp = resp && createModelPart«g_counter++»();
-					«System.out.print(e.name)»
-					«context.class.toString»
-				«ENDFOR»
-				
 		        return resp;
 		    }
 		    
@@ -88,7 +94,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 			}
 		    
 			//«g_counter=0»: Glossary
-			«FOR g: resource.allContents.toIterable.filter(Glossary)»
+			«FOR g: glossaries»
 			private static boolean createModelPart«g_counter++»() {
 				try {
 					EntityManager em = HibernateUtil.getEntityManager();
