@@ -16,7 +16,7 @@ GlossarySection:
 
 GlossaryEntry:
 	'[' name=ID ']'
-		information=GlossaryEntryInformation //debattierbar -> gleich hier hoch?
+		information=GlossaryEntryInformation
 ;
 
 GlossaryEntryInformation:

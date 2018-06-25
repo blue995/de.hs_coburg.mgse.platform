@@ -1,0 +1,24 @@
+Glossar BegriffeTest
+
+Sektion "irgendwas anderes"
+	[aaa]
+	Wort: "aaa"
+	Bedeutung: "dddd"
+	Abkuerzung: "sadfadsf"
+	
+	[bbb]
+	Wort: "bbb"
+	Bedeutung: "asdfdasdf"
+	Abkuerzung: "asdsffasdf"
+	
+	[ccc]
+	Wort: "ccc"
+	Bedeutung: "Madfasdfsadfmittelt."
+	Abkuerzung: "dfdfd"
+		
+	[ddd]
+	Wort: "ddd"
+	Bedeutung: "Bachelorabschluasdfasdfss eines natusadfrwissenschaftlichen Stuasdfasdfdienganges"
+	Abkuerzung: "B.adsfadsf."
+Ende
+
