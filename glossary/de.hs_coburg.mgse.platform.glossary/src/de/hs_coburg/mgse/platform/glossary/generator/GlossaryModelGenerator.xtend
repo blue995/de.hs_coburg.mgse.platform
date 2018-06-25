@@ -18,11 +18,14 @@ import org.eclipse.xtext.generator.IGeneratorContext
  */
 class GlossaryModelGenerator extends AbstractGenerator {
 
-	private int  g_counter = 0;
+	private int g_counter = 0;
 	private int gs_counter = 0;
 	private int ge_counter = 0;
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
+		//implement me
+		fsa.generateFile("GlossaryModelCreator.java", compileGlossaries(resource, fsa, context))
+		
 		for(e: resource.allContents.toIterable.filter(Glossary)) {
 			fsa.generateFile(
 				e.name.toLowerCase() + ".html",
@@ -32,10 +35,11 @@ class GlossaryModelGenerator extends AbstractGenerator {
 				e.name.toLowerCase() + ".css",
 				compileCSS
 			)
+			/* 
 			fsa.generateFile(
 				"Glossary"+(g_counter++).toString()+"ModelCreator.java",
             	e.compileModelCreatorGlossary
-			)
+			)*/
 		}
 		for(e: resource.allContents.toIterable.filter(GlossarySection)) {
 			fsa.generateFile(
@@ -51,6 +55,82 @@ class GlossaryModelGenerator extends AbstractGenerator {
 		}
 	}
 	
+	def compileGlossaries(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context)'''
+		package de.hs_coburg.mgse.modelcreator;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		import java.util.ArrayList;
+		import java.util.List;
+		
+		import de.hs_coburg.mgse.persistence.model.Glossary;
+		import de.hs_coburg.mgse.persistence.model.GlossaryEntry;
+		import de.hs_coburg.mgse.persistence.model.GlossarySection;
+		
+		public class GlossaryModelCreator {
+		    public static boolean createModel() {
+		        boolean resp = true;
+				
+				«FOR e: resource.allContents.toIterable.filter(Glossary)»
+					blabla
+					resp = resp && createModelPart«g_counter++»();
+					«System.out.print(e.name)»
+					«context.class.toString»
+				«ENDFOR»
+				
+		        return resp;
+		    }
+		    
+			private static void setGlossaryEntryMaterials(GlossaryEntry ge, String word, String meaning, String abbreviation) {
+				ge.setWord(word);
+		        ge.setMeaning(meaning);
+		        ge.setAbbreviation(abbreviation);
+			}
+		    
+			//«g_counter=0»: Glossary
+			«FOR g: resource.allContents.toIterable.filter(Glossary)»
+			private static boolean createModelPart«g_counter++»() {
+				try {
+					EntityManager em = HibernateUtil.getEntityManager();
+					em.getTransaction().begin();
+
+					Glossary g = new Glossary();
+					List<GlossarySection> l_gs = new ArrayList<GlossarySection>();
+
+					«FOR gs: g.sections»
+						GlossarySection gs_«gs_counter» = new GlossarySection();
+						List<GlossaryEntry> l_ge_«gs_counter» = new ArrayList<GlossaryEntry>();
+					
+						«FOR ge: gs.entries»
+							GlossaryEntry ge_«ge_counter» = new GlossaryEntry();
+							setGlossaryEntryMaterials(ge_«ge_counter», "«ge.information.word»", "«ge.information.meaning»", "«ge.information.abbreviation»");
+							l_ge_«gs_counter».add(ge_«ge_counter»);
+							//«ge_counter++»
+						«ENDFOR»
+					
+						gs_«gs_counter».setEntries(l_ge_«gs_counter»);
+						gs_«gs_counter».setCompleteName("«gs.completeName»");
+					
+						l_gs.add(gs_«gs_counter»);
+						//«gs_counter++»
+					«ENDFOR»
+				
+					g.setSections(l_gs);
+					em.persist(g);
+					
+					//commit and close Transaction
+					em.getTransaction().commit();
+					return true;
+				} catch(Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+			}
+			«ENDFOR»
+		}
+	'''
+	
+	/*
 	def compileModelCreatorGlossary(Glossary g)'''
 		package de.hs_coburg.mgse.modelcreator;
 		
@@ -98,7 +178,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 					
 		            //commit and close Transaction
 		            em.getTransaction().commit();
-		            em.close();
+		            //em.close();
 		        } catch(Exception e) {
 		            e.printStackTrace();
 		            resp = false;
@@ -107,6 +187,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 		    }
 		}
 	'''
+	*/
 	
 	def compileModelCreatorGlossarySection(GlossarySection gs) '''
 	

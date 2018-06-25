@@ -7,7 +7,7 @@ import de.hs_coburg.mgse.platform.course.courseModel.CourseOfStudies
 import de.hs_coburg.mgse.platform.course.courseModel.Faculty
 import de.hs_coburg.mgse.platform.course.courseModel.Degree
 import de.hs_coburg.mgse.platform.course.courseModel.DegreeList
-import de.hs_coburg.mgse.platform.course.courseModel.SubDegree
+import de.hs_coburg.mgse.platform.course.courseModel.AdmissionRequirementList
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
@@ -27,6 +27,10 @@ class CourseModelGenerator extends AbstractGenerator {
 	private int d_counter = 0;
 	private int dc_counter = 0;
 	private int sd_counter = 0;
+
+	//counter for compileModelAdmissionRequirement
+	private int ar_counter = 0;
+	private int art_counter = 0;
 	
 	//counter for compileModelCreatorFaculty
 	private int c_counter = 0;
@@ -44,6 +48,12 @@ class CourseModelGenerator extends AbstractGenerator {
 			fsa.generateFile(
 				"DegreeModel"+(dl_counter++).toString()+"Creator.java",
             	e.compileModelCreatorDegree
+			)
+		}
+		for(e: resource.allContents.toIterable.filter(AdmissionRequirementList)) {
+			fsa.generateFile(
+				"AdmissionRequirement"+(ar_counter++).toString()+"Creator.java",
+            	e.compileModelAdmissionRequirement
 			)
 		}
 		for(e: resource.allContents.toIterable.filter(Faculty)) {
@@ -118,10 +128,6 @@ class CourseModelGenerator extends AbstractGenerator {
 				return resp;
 			}
 		}
-		
-		
-		«f.professors»
-		«f.courses»
 	'''
 	
 	def compileModelCreatorDegree(DegreeList dl) '''
@@ -172,6 +178,43 @@ class CourseModelGenerator extends AbstractGenerator {
 		            «ENDFOR»
 		           	
 		          	em.getTransaction().commit();
+		         	//em.close();
+				} catch(Exception e) {
+					e.printStackTrace();
+					resp = false;
+				}
+				return resp;
+			}
+		}
+	'''
+	
+	def compileModelAdmissionRequirement(AdmissionRequirementList arl) '''
+		package de.hs_coburg.mgse.modelcreator;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		import java.util.ArrayList;
+		import java.util.List;
+		
+		import de.hs_coburg.mgse.persistence.model.AdmissionRequirement;
+		
+		public class AdmissionRequirementModelCreator {
+		    public boolean createModel() {
+		        boolean resp = true;
+		        try {
+		            EntityManager em = HibernateUtil.getEntityManager();
+		            em.getTransaction().begin();
+		            
+					//implement me
+					«FOR ar: arl.requirements»
+						«FOR a: ar.value»
+							AdmissionRequirement ar«art_counter» = new AdmissionRequirement();
+							ar«art_counter».setValue("«a»");
+							em.persist(ar«art_counter++»);
+							
+						«ENDFOR»						
+					«ENDFOR»
+					em.getTransaction().commit();
 		         	//em.close();
 				} catch(Exception e) {
 					e.printStackTrace();
