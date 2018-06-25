@@ -13,7 +13,8 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
-
+import java.util.Collection
+import java.util.LinkedList
 
 /**
  * Generates code from your model files on save.
@@ -27,44 +28,171 @@ class CourseModelGenerator extends AbstractGenerator {
 	private int d_counter = 0;
 	private int dc_counter = 0;
 	private int sd_counter = 0;
+	private Collection<DegreeList> toVisitDegree
 
 	//counter for compileModelAdmissionRequirement
 	private int ar_counter = 0;
 	private int art_counter = 0;
+	private Collection<AdmissionRequirementList> toVisitAdmissionRequirement
 	
 	//counter for compileModelCreatorFaculty
 	private int c_counter = 0;
 	private int cos_counter = 0;
 	private int p_counter = 0;
+	private int cos_ar_counter = 0;
+	private Collection<Faculty> toVisitFaculty
+	
+	new(){
+		toVisitDegree = null
+		toVisitAdmissionRequirement = null
+		toVisitFaculty = null
+	}
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
+		
+		//Degree Generation
+		if(toVisitDegree === null){
+			val allDegreesToGenerate = resource.resourceSet.resources.map[r | r.allContents.toIterable.filter(DegreeList)].flatten
+			toVisitDegree = new LinkedList<DegreeList>
+			toVisitDegree.addAll(allDegreesToGenerate)
+			fsa.generateFile("DegreeModelCreator.java", compileDegrees(toVisitDegree))
+		}
+		
+		//AdmissionRequirement Generation
+		if(toVisitAdmissionRequirement === null){
+			val allAdmissionRequirementsToGenerate = resource.resourceSet.resources.map[r | r.allContents.toIterable.filter(AdmissionRequirementList)].flatten
+			toVisitAdmissionRequirement = new LinkedList<AdmissionRequirementList>
+			toVisitAdmissionRequirement.addAll(allAdmissionRequirementsToGenerate)
+			fsa.generateFile("AdmissionRequirementModelCreator.java", compileAdmissionRequirements(toVisitAdmissionRequirement))
+		} 
+		
+		//Course Generation
+		if(toVisitFaculty === null){
+			val allFacultiesToGenerate = resource.resourceSet.resources.map[r | r.allContents.toIterable.filter(Faculty)].flatten
+			toVisitFaculty = new LinkedList<Faculty>
+			toVisitFaculty.addAll(allFacultiesToGenerate)
+			fsa.generateFile("CourseModelCreator.java", compileCourse(toVisitFaculty))
+		} 
+		
 		for(e: resource.allContents.toIterable.filter(Faculty)) {
 			fsa.generateFile(
 				e.name + ".html",
 				e.compileHTML
 			)
 		}
-		for(e: resource.allContents.toIterable.filter(DegreeList)) {
-			fsa.generateFile(
-				"DegreeModel"+(dl_counter++).toString()+"Creator.java",
-            	e.compileModelCreatorDegree
-			)
-		}
-		for(e: resource.allContents.toIterable.filter(AdmissionRequirementList)) {
-			fsa.generateFile(
-				"AdmissionRequirement"+(ar_counter++).toString()+"Creator.java",
-            	e.compileModelAdmissionRequirement
-			)
-		}
-		for(e: resource.allContents.toIterable.filter(Faculty)) {
-			fsa.generateFile(
-				"CourseModel"+(c_counter)+"Creator.java",
-            	e.compileModelCreatorCourse
-			)
-		}	
 	}
 	
-	def compileModelCreatorCourse(Faculty f)'''
+	def compileDegrees(Collection<DegreeList> degrees) '''
+		package de.hs_coburg.mgse.modelcreator;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		
+		import de.hs_coburg.mgse.persistence.model.Degree;
+		import de.hs_coburg.mgse.persistence.model.DegreeClass;
+		import de.hs_coburg.mgse.persistence.model.SubDegree;
+		import de.hs_coburg.mgse.persistence.model.GlossaryEntry;
+		
+		public class DegreeModelCreator {
+		    public static boolean createModel() {
+		        boolean resp = true;
+		        
+		        «FOR d: degrees»
+		        	resp = resp && createModelPart«dl_counter++»();
+		        «ENDFOR»
+		        
+		        return resp;
+		    }
+		    
+		    //«dl_counter=0»: Degree
+			«FOR d: degrees»
+			private static boolean createModelPart«dl_counter++»() {
+				try {
+					EntityManager em = HibernateUtil.getEntityManager();
+					em.getTransaction().begin();
+					
+					«FOR dc: d.degreeClasses»
+						DegreeClass dc«dc_counter» = new DegreeClass();
+						dc«dc_counter».setCompleteName("«dc.name»");
+						em.persist(dc«dc_counter++»);
+						
+					«ENDFOR»
+					«FOR sd: d.subDegrees»
+						SubDegree sd«sd_counter» = new SubDegree();
+						sd«sd_counter».setCompleteName("«sd.name»");
+						em.persist(sd«sd_counter++»);
+						
+					«ENDFOR»
+					«FOR d_: d.degrees»
+						Degree d«d_counter» = new Degree();
+						GlossaryEntry ge«d_counter» = (GlossaryEntry) em.createQuery("SELECT ge FROM GlossaryEntry ge WHERE ge.abbreviation = '«d_.glossaryEntry.information.abbreviation»' AND ge.meaning = '«d_.glossaryEntry.information.meaning»' AND ge.word = '«d_.glossaryEntry.information.word»'").getSingleResult();
+						SubDegree sd_«d_counter» = (SubDegree) em.createQuery("SELECT sd FROM SubDegree sd WHERE sd.completeName = '«d_.degree.completeName»'").getSingleResult();
+						DegreeClass dc_«d_counter» = (DegreeClass) em.createQuery("SELECT dc FROM DegreeClass dc WHERE dc.completeName = '«d_.degreeClass.completeName»'").getSingleResult();
+						d«d_counter».setGlossaryEntry(ge«d_counter»);
+						d«d_counter».setDegreeClass(dc_«d_counter»);
+						d«d_counter».setSubDegree(sd_«d_counter»);
+						em.persist(d«d_counter++»);
+						
+		            «ENDFOR»
+					//commit and close Transaction
+					em.getTransaction().commit();
+					return true;
+				} catch(Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+			}
+		    «ENDFOR»
+		}
+	'''
+	
+	def compileAdmissionRequirements(Collection<AdmissionRequirementList> requirements) '''
+		package de.hs_coburg.mgse.modelcreator;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		
+		import de.hs_coburg.mgse.persistence.model.AdmissionRequirement;
+		
+		public class AdmissionRequirementModelCreator {
+		    public static boolean createModel() {
+		        boolean resp = true;
+		        
+		        «FOR r: requirements»
+		        	resp = resp && createModelPart«ar_counter++»();
+		        «ENDFOR»
+		        
+		        return resp;
+		    }
+		    
+		    //«ar_counter=0»: AdmissionRequirement
+			«FOR r: requirements»
+				private static boolean createModelPart«ar_counter++»() {
+					try {
+						EntityManager em = HibernateUtil.getEntityManager();
+						em.getTransaction().begin();
+
+						«FOR ar: r.requirements»
+							«FOR a: ar.value»
+								AdmissionRequirement ar«art_counter» = new AdmissionRequirement();
+								ar«art_counter».setValue("«a»");
+								em.persist(ar«art_counter++»);
+								
+							«ENDFOR»						
+						«ENDFOR»
+						//commit and close Transaction
+						em.getTransaction().commit();
+						return true;
+					} catch(Exception e) {
+						e.printStackTrace();
+						return false;
+					}
+				}
+		    «ENDFOR»
+		}
+	'''
+	
+	def compileCourse(Collection<Faculty> faculties) '''
 		package de.hs_coburg.mgse.modelcreator;
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
@@ -77,150 +205,79 @@ class CourseModelGenerator extends AbstractGenerator {
 		import de.hs_coburg.mgse.persistence.model.Professor;
 		import de.hs_coburg.mgse.persistence.model.Degree;
 		import de.hs_coburg.mgse.persistence.model.GlossaryEntry;
+		import de.hs_coburg.mgse.persistence.model.AdmissionRequirement;
 		
-		public class CourseModel«c_counter++»Creator {
-		    public boolean createModel() {
+		public class CourseModelCreator {
+		    public static boolean createModel() {
 		        boolean resp = true;
-		        try {
-		            EntityManager em = HibernateUtil.getEntityManager();
-		            em.getTransaction().begin();
-		            
-					//Implement me
+		        
+		        «FOR f: faculties»
+		        	resp = resp && createModelPart«c_counter++»();
+		        «ENDFOR»
+		        
+		        return resp;
+			}
+			
+			//«c_counter=0»: Course
+			«FOR f: faculties»
+			private static boolean createModelPart«c_counter++»() {
+				try {
+					EntityManager em = HibernateUtil.getEntityManager();
+					em.getTransaction().begin();
+					
 					Faculty f = new Faculty();
 					f.setCompleteName("«f.completeName»");
 					List<CourseOfStudies> l_cos = new ArrayList<CourseOfStudies>();
 					List<Professor> l_p = new ArrayList<Professor>();
 					
 					«FOR cos: f.courses»
-					CourseOfStudies cos«cos_counter» = new CourseOfStudies();
-					cos«cos_counter».setCompleteName("«cos.completeName»");
-					cos«cos_counter».setEcts(«cos.ects»);
-					cos«cos_counter».setSemester(«cos.semester»);
-					Degree d«cos_counter» = (Degree) em.createQuery("SELECT d FROM Degree d WHERE d.degreeClass.completeName = '«cos.degree.degreeClass.completeName»' AND d.subDegree.completeName = '«cos.degree.degree.completeName»'").getSingleResult();
-					cos«cos_counter».setDegree(d«cos_counter»);
-					l_cos.add(cos«cos_counter++»);
-					//persist?
-					
+						CourseOfStudies cos«cos_counter» = new CourseOfStudies();
+						List<AdmissionRequirement> l_cos«cos_counter» = new ArrayList<AdmissionRequirement>();
+						Degree d«cos_counter» = (Degree) em.createQuery("SELECT d FROM Degree d WHERE d.degreeClass.completeName = '«cos.degree.degreeClass.completeName»' AND d.subDegree.completeName = '«cos.degree.degree.completeName»'").getSingleResult();
+							«FOR ar: cos.requirements»
+								«FOR arv: ar.value»
+									AdmissionRequirement ar«cos_ar_counter» = (AdmissionRequirement) em.createQuery("SELECT ar FROM AdmissionRequirement  ar WHERE ar.value = '«arv»'").getSingleResult();
+									l_cos«cos_counter».add(ar«cos_ar_counter++»);
+								«ENDFOR»
+							«ENDFOR»
+						setCourseOfStudiesMaterials(cos«cos_counter», l_cos«cos_counter», "«cos.completeName»", d«cos_counter», «cos.ects», «cos.semester»);
+						l_cos.add(cos«cos_counter++»);
+						
 					«ENDFOR»
+					
 					«FOR p: f.professors»
-					Professor p«p_counter» = new Professor();
-					p«p_counter».setFirstName("«p.firstName»");
-					p«p_counter».setMiddleName("«p.middleName»");
-					p«p_counter».setLastName("«p.lastName»");
-					p«p_counter».setRoom("«p.room»");
-					p«p_counter».setEmail("«p.email»");
-					GlossaryEntry ge«p_counter» = (GlossaryEntry) em.createQuery("SELECT ge FROM GlossaryEntry ge WHERE ge.abbreviation = '«p.abbreviation.information.abbreviation»' AND ge.word = '«p.abbreviation.information.word»' AND ge.meaning = '«p.abbreviation.information.meaning»' ").getSingleResult();
-					p«p_counter».setAbbreviation(ge«p_counter»);
-					l_p.add(p«p_counter++»);
-					//persist?
-					
+						Professor p«p_counter» = new Professor();
+						p«p_counter».setFirstName("«p.firstName»");
+						p«p_counter».setMiddleName("«p.middleName»");
+						p«p_counter».setLastName("«p.lastName»");
+						p«p_counter».setRoom("«p.room»");
+						p«p_counter».setEmail("«p.email»");
+						GlossaryEntry ge«p_counter» = (GlossaryEntry) em.createQuery("SELECT ge FROM GlossaryEntry ge WHERE ge.abbreviation = '«p.abbreviation.information.abbreviation»' AND ge.word = '«p.abbreviation.information.word»' AND ge.meaning = '«p.abbreviation.information.meaning»' ").getSingleResult();
+						p«p_counter».setAbbreviation(ge«p_counter»);
+						l_p.add(p«p_counter++»);
+						
 					«ENDFOR»
+					
 					f.setProfessors(l_p);
 					f.setCourseOfStudies(l_cos);
 					em.persist(f);
-		           	
-		          	em.getTransaction().commit();
-		         	//em.close();
-				} catch(Exception e) {
-					e.printStackTrace();
-					resp = false;
-				}
-				return resp;
-			}
-		}
-	'''
-	
-	def compileModelCreatorDegree(DegreeList dl) '''
-		package de.hs_coburg.mgse.modelcreator;
-		
-		import de.hs_coburg.mgse.persistence.HibernateUtil;
-		import javax.persistence.EntityManager;		
-		import java.util.ArrayList;
-		import java.util.List;
-		
-		import de.hs_coburg.mgse.persistence.model.Degree;
-		import de.hs_coburg.mgse.persistence.model.DegreeClass;
-		import de.hs_coburg.mgse.persistence.model.SubDegree;
-		import de.hs_coburg.mgse.persistence.model.GlossaryEntry;
-		
-		public class DegreeModelCreator {
-		    public boolean createModel() {
-		        boolean resp = true;
-		        try {
-		            EntityManager em = HibernateUtil.getEntityManager();
-		            em.getTransaction().begin();
-		            
-		            «FOR dc: dl.degreeClasses»
-		            	DegreeClass dc«dc_counter» = new DegreeClass();
-		            	dc«dc_counter».setCompleteName("«dc.name»");
-		            	em.persist(dc«dc_counter++»);
-		            	
-		            «ENDFOR»
-		            
-		            «FOR sd: dl.subDegrees»
-		            	SubDegree sd«sd_counter» = new SubDegree();
-		            	sd«sd_counter».setCompleteName("«sd.name»");
-		            	em.persist(sd«sd_counter++»);
-		            	
-		            «ENDFOR»
-		            
-		            «FOR d: dl.degrees»
-		            	Degree d«d_counter» = new Degree();
-		            	GlossaryEntry ge«d_counter» = (GlossaryEntry) em.createQuery("SELECT ge FROM GlossaryEntry ge WHERE ge.abbreviation = '«d.glossaryEntry.information.abbreviation»' AND ge.meaning = '«d.glossaryEntry.information.meaning»' AND ge.word = '«d.glossaryEntry.information.word»'").getSingleResult();
-		            	SubDegree sd_«d_counter» = (SubDegree) em.createQuery("SELECT sd FROM SubDegree sd WHERE sd.completeName = '«d.degree.completeName»'").getSingleResult();
-		            	DegreeClass dc_«d_counter» = (DegreeClass) em.createQuery("SELECT dc FROM DegreeClass dc WHERE dc.completeName = '«d.degreeClass.completeName»'").getSingleResult();
-		            	d«d_counter».setGlossaryEntry(ge«d_counter»);
-		            	d«d_counter».setDegreeClass(dc_«d_counter»);
-		            	d«d_counter».setSubDegree(sd_«d_counter»);
-		            	em.persist(d«d_counter++»);
-		            	//courseOfStudies missing
-		            	
-		            «ENDFOR»
-		           	
-		          	em.getTransaction().commit();
-		         	//em.close();
-				} catch(Exception e) {
-					e.printStackTrace();
-					resp = false;
-				}
-				return resp;
-			}
-		}
-	'''
-	
-	def compileModelAdmissionRequirement(AdmissionRequirementList arl) '''
-		package de.hs_coburg.mgse.modelcreator;
-		
-		import de.hs_coburg.mgse.persistence.HibernateUtil;
-		import javax.persistence.EntityManager;		
-		import java.util.ArrayList;
-		import java.util.List;
-		
-		import de.hs_coburg.mgse.persistence.model.AdmissionRequirement;
-		
-		public class AdmissionRequirementModelCreator {
-		    public boolean createModel() {
-		        boolean resp = true;
-		        try {
-		            EntityManager em = HibernateUtil.getEntityManager();
-		            em.getTransaction().begin();
-		            
-					//implement me
-					«FOR ar: arl.requirements»
-						«FOR a: ar.value»
-							AdmissionRequirement ar«art_counter» = new AdmissionRequirement();
-							ar«art_counter».setValue("«a»");
-							em.persist(ar«art_counter++»);
-							
-						«ENDFOR»						
-					«ENDFOR»
+					
+					//commit and close Transaction
 					em.getTransaction().commit();
-		         	//em.close();
+					return true;
 				} catch(Exception e) {
 					e.printStackTrace();
-					resp = false;
+					return false;
 				}
-				return resp;
+			}
+		    «ENDFOR»
+		    
+		    private static void setCourseOfStudiesMaterials(CourseOfStudies cos, List<AdmissionRequirement> l_cos, String completeName, Degree d, int ects, int semester) {
+		    	cos.setRequirements(l_cos);
+		    	cos.setCompleteName(completeName);
+		    	cos.setEcts(ects);
+		    	cos.setSemester(semester);
+		    	cos.setDegree(d);
 			}
 		}
 	'''

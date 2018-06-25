@@ -30,15 +30,13 @@ class GlossaryModelGenerator extends AbstractGenerator {
 	}
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		// First iteration
+		//Glossary Generation
 		if(toVisit === null){
 			val allGlossariesToGenerate = resource.resourceSet.resources.map[r | r.allContents.toIterable.filter(Glossary)].flatten
-			println("Generate: " + allGlossariesToGenerate)
 			toVisit = new LinkedList<Glossary>
 			toVisit.addAll(allGlossariesToGenerate)
 			fsa.generateFile("GlossaryModelCreator.java", compileGlossaries(toVisit))
 		} 
-		
 		
 		for(e: resource.allContents.toIterable.filter(Glossary)) {
 			fsa.generateFile(
@@ -49,11 +47,6 @@ class GlossaryModelGenerator extends AbstractGenerator {
 				e.name.toLowerCase() + ".css",
 				compileCSS
 			)
-			/* 
-			fsa.generateFile(
-				"Glossary"+(g_counter++).toString()+"ModelCreator.java",
-            	e.compileModelCreatorGlossary
-			)*/
 		}
 		for(e: resource.allContents.toIterable.filter(GlossarySection)) {
 			fsa.generateFile(
@@ -84,6 +77,11 @@ class GlossaryModelGenerator extends AbstractGenerator {
 		public class GlossaryModelCreator {
 		    public static boolean createModel() {
 		        boolean resp = true;
+		        
+		        «FOR g: glossaries»
+		        	resp = resp && createModelPart«g_counter++»();
+		        «ENDFOR»
+		        
 		        return resp;
 		    }
 		    
@@ -134,69 +132,6 @@ class GlossaryModelGenerator extends AbstractGenerator {
 			}
 			«ENDFOR»
 		}
-	'''
-	
-	/*
-	def compileModelCreatorGlossary(Glossary g)'''
-		package de.hs_coburg.mgse.modelcreator;
-		
-		import de.hs_coburg.mgse.persistence.HibernateUtil;
-		import javax.persistence.EntityManager;		
-		import java.util.ArrayList;
-		import java.util.List;
-		
-		import de.hs_coburg.mgse.persistence.model.Glossary;
-		import de.hs_coburg.mgse.persistence.model.GlossaryEntry;
-		import de.hs_coburg.mgse.persistence.model.GlossarySection;
-		
-		public class GlossaryModelCreator {
-		    public static boolean createModel() {
-		        boolean resp = true;
-		        try {
-		            EntityManager em = HibernateUtil.getEntityManager();
-		            em.getTransaction().begin();
-		
-					Glossary g = new Glossary();
-					List<GlossarySection> l_gs = new ArrayList<GlossarySection>();
-					
-					«FOR gs: g.sections»
-						GlossarySection gs_«gs_counter» = new GlossarySection();
-						List<GlossaryEntry> l_ge_«gs_counter» = new ArrayList<GlossaryEntry>();
-						
-						«FOR ge: gs.entries»
-							GlossaryEntry ge_«ge_counter» = new GlossaryEntry();
-							ge_«ge_counter».setWord("«ge.information.word»");
-							ge_«ge_counter».setMeaning("«ge.information.meaning»");
-							ge_«ge_counter».setAbbreviation("«ge.information.abbreviation»");
-							l_ge_«gs_counter».add(ge_«ge_counter»);
-							//«ge_counter++»
-						«ENDFOR»
-						
-						gs_«gs_counter».setEntries(l_ge_«gs_counter»);
-						gs_«gs_counter».setCompleteName("«gs.completeName»");
-						
-						l_gs.add(gs_«gs_counter»);
-						//«gs_counter++»
-					«ENDFOR»
-					
-					g.setSections(l_gs);
-					em.persist(g);
-					
-		            //commit and close Transaction
-		            em.getTransaction().commit();
-		            //em.close();
-		        } catch(Exception e) {
-		            e.printStackTrace();
-		            resp = false;
-		        }
-		        return resp;
-		    }
-		}
-	'''
-	*/
-	
-	def compileModelCreatorGlossarySection(GlossarySection gs) '''
-	
 	'''
 	
 	def compileHTML(Glossary glossary)'''
@@ -275,7 +210,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 	def compileEntityBean(GlossarySection gs)'''
 		import javax.persistence.*;
 		import java.util.List;
-	
+
 		@Entity(name = "GlossarySection")
 		@Table(name = "GLOSSARYSECTION")
 		public class GlossarySection {
@@ -360,6 +295,4 @@ class GlossaryModelGenerator extends AbstractGenerator {
 			«ENDFOR»
 		}
 	'''
-	
-	
 }
