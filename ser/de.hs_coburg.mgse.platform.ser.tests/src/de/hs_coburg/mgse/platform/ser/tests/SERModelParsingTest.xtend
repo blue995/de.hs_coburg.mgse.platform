@@ -8,9 +8,9 @@ import de.hs_coburg.mgse.platform.ser.sERModel.Model
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.testing.util.ParseHelper
-import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
+import static org.junit.Assert.*
 
 @RunWith(XtextRunner)
 @InjectWith(SERModelInjectorProvider)
@@ -19,7 +19,7 @@ class SERModelParsingTest {
 	ParseHelper<Model> parseHelper
 	
 	@Test
-	def void loadExamTypeDeclarationList() {
+	def void examTypeDeclarationListIsGenerated() {
 		val result = parseHelper.parse('''
 			Pruefungsarten [
 				Typ schrPr
@@ -27,12 +27,83 @@ class SERModelParsingTest {
 				Einheit "Minuten"
 			]
 		''')
-		Assert.assertNotNull(result)
-		Assert.assertTrue(result.eResource.errors.isEmpty)
+		assertNotNull(result)
+		assertTrue(result.eResource.errors.isEmpty)
 	}
 	
 	@Test
-	def void loadCourseTypeDeclarationList() {
+	def void examTypeDeclarationHasNoErrorsWithOneEntry() {
+		val result = parseHelper.parse('''
+			Pruefungsarten [
+				Typ schrPr
+				Details Begriffe.schrPr
+				Einheit "Minuten"
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void examTypeDeclarationHasNoErrorsWithMultipleEntries() {
+		val result = parseHelper.parse('''
+			Pruefungsarten [
+				Typ schrPr
+				Details Begriffe.schrPr
+				Einheit "Minuten"
+				
+				Typ mdlPr
+				Details Begriffe.mdlPr
+				Einheit "Minuten"
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void examTypeDeclarationListTypeIsRequired() {
+		val result = parseHelper.parse('''
+			Pruefungsarten [
+				Details Begriffe.schrPr
+				Einheit "Minuten"
+			]
+		''')
+		assertNull(result)
+	}
+	
+	@Test
+	def void examTypeDeclarationListDetailsIsRequired() {
+		val result = parseHelper.parse('''
+			Pruefungsarten [
+				Typ schrPr
+				Einheit "Minuten"
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void examTypeDeclarationListUnitIsRequired() {
+		val result = parseHelper.parse('''
+			Pruefungsarten [
+				Typ schrPr
+				Details Begriffe.schrPr
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void examTypeDeclarationListNeedsAtLeastOneEntry() {
+		val result = parseHelper.parse('''
+			Pruefungsarten [
+			
+			]
+		''')
+		assertNull(result)
+	}
+	
+	@Test
+	def void courseTypeDeclarationListIsGenerated() {
 		val result = parseHelper.parse('''
 			Lehrveranstaltungsarten [
 				Typ SU // Seminaristischer Unterricht
@@ -48,15 +119,428 @@ class SERModelParsingTest {
 				Details Begriffe.Pr
 			]
 		''')
-		Assert.assertNotNull(result)
-		Assert.assertTrue(result.eResource.errors.isEmpty)
+		assertNotNull(result)
+		assertTrue(result.eResource.errors.isEmpty)
 	}
 	
 	@Test
-	def void loadStudyExaminationRegulations() {
+	def void courseTypeDeclarationHasNoErrorsWithOneEntry() {
+		val result = parseHelper.parse('''
+			Lehrveranstaltungsarten [
+				Typ SU // Seminaristischer Unterricht
+				Details Begriffe.SU
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void courseTypeDeclarationHasNoErrorsWithMultipleEntries() {
+		val result = parseHelper.parse('''
+			Lehrveranstaltungsarten [
+				Typ SU // Seminaristischer Unterricht
+				Details Begriffe.SU
+				
+				Typ UE // Übung
+				Details Begriffe.UE
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void courseTypeDeclarationTypeIsRequired() {
+		val result = parseHelper.parse('''
+			Lehrveranstaltungsarten [
+				Details Begriffe.SU
+			]
+		''')
+		assertNull(result)
+	}
+	
+	@Test
+	def void courseTypeDeclarationDetailsIsRequired() {
+		val result = parseHelper.parse('''
+			Lehrveranstaltungsarten [
+				Typ UE // Übung
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void courseTypeDeclarationNeedsAtLeastOneEntry() {
+		val result = parseHelper.parse('''
+			Lehrveranstaltungsarten [
+			
+			]
+		''')
+		assertNull(result)
+	}
+	
+	@Test
+	def void serIsGenerated() {
 		val result = parseHelper.parse('''
 			SPO
 				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertNotNull(result)
+	}
+	
+	@Test
+	def void thisShouldWorkButItDoesntFML() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		//assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serFootnotesIsOptional() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		//assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serSpoNameIsRequired() {
+		val result = parseHelper.parse('''
 			Studiengang
 				EIF.IF_B
 			Version
@@ -178,7 +662,2305 @@ class SERModelParsingTest {
 				
 			]
 		''')
-		//Assert.assertNotNull(result)
-		//Assert.assertTrue(result.eResource.errors.isEmpty)
+		assertNull(result)
+	}
+	
+	@Test
+	def void serCourseOfStudiesIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+
+	@Test
+	def void serVersionIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serValidityDateIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serTitleIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serPrefaceIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serParagraphsIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serParagraphNumberIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serParagraphTitleIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serParagraphSenenceOrSubParagraphIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serParagraphSubParagraphNumberIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					§ 2
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serParagraphSubParagraphSentenceIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					§ 2
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsModulesIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsModuleNameIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					] 
+				]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsModuleEctsIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					] 
+				]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsModuleQuantifierIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					] 
+				]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsModuleSemesterHoursIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					] 
+				]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsModuleTypeIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					] 
+				]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsModuleExamTypeIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					] 
+				]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsModuleCourseTypeIsRequired() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+				]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void serStudySectionsModuleHasAtLeastOneExamType() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+					]
+					Lehrveranstaltungsarten [
+						Pr, SU, UE, V
+					] 
+				]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
 	}
 }
