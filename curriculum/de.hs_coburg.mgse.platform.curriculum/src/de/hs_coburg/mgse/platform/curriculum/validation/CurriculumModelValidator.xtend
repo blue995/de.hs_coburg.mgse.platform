@@ -3,6 +3,14 @@
  */
 package de.hs_coburg.mgse.platform.curriculum.validation
 
+import org.eclipse.xtext.validation.Check
+import de.hs_coburg.mgse.platform.curriculum.curriculumModel.Curriculum
+import de.hs_coburg.mgse.platform.curriculum.curriculumModel.CurriculumModelPackage
+import de.hs_coburg.mgse.platform.curriculum.curriculumModel.CurriculumEntry
+import org.omg.stub.java.rmi._Remote_Stub
+import de.hs_coburg.mgse.platform.curriculum.curriculumModel.ConcreteExamType
+import de.hs_coburg.mgse.platform.curriculum.utils.ConcreteExamTypeBehavior
+import de.hs_coburg.mgse.platform.curriculum.utils.CurriculumEntryBehavior
 
 /**
  * This class contains custom validation rules. 
@@ -10,7 +18,8 @@ package de.hs_coburg.mgse.platform.curriculum.validation
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 class CurriculumModelValidator extends AbstractCurriculumModelValidator {
-	
+	extension ConcreteExamTypeBehavior = new ConcreteExamTypeBehavior
+	extension CurriculumEntryBehavior = new CurriculumEntryBehavior
 //	public static val INVALID_NAME = 'invalidName'
 //
 //	@Check
@@ -21,5 +30,89 @@ class CurriculumModelValidator extends AbstractCurriculumModelValidator {
 //					INVALID_NAME)
 //		}
 //	}
+
+
+	// "The version of a curriculum should be greater than 0."
+	@Check
+	def checkVersionOfCurriculum(Curriculum cur) {
+		val version = cur.getVersion()
+		if (version <= 0)
+			error('Negative Version', cur, CurriculumModelPackage.Literals.CURRICULUM__VERSION)
+	}
+
+	// "The year of a curriculum should be greater than 0."
+	@Check
+	def checkYearOfCurriculum(Curriculum cur) {
+		val year = cur.getYear()
+		if (year <= 0)
+			error('Year cannot be lower than 0', cur, CurriculumModelPackage.Literals.CURRICULUM__YEAR)
+	}
 	
+	// "All specified modules of the curriculum have to be specified by the referenced SER."
+	@Check
+	def checkSpecifiedModules(Curriculum cur) {
+		val studySections = cur.ser.studySections
+		val curEntries = cur.curriculumEntries
+		
+		for (var int i = 0; i < studySections.size(); i++) {
+			val possibleModules = studySections.get(i).modules
+			
+			for (var int j = 0; j < curEntries.size(); j++) {
+				val specifiedModuleSpecification = curEntries.get(j).moduleSpecification.module
+					
+				if (!possibleModules.contains(specifiedModuleSpecification)) {
+					error('All specified modules of the curriculum have to be specified by the referenced SER', cur, CurriculumModelPackage.Literals.CURRICULUM__CURRICULUM_ENTRIES)
+				}
+			}
+		}
+	}
+	
+	// "A concrete exam type of a module specification can only refer to exam types that are allowed by the referenced module."
+	@Check
+	def checkExamType(ConcreteExamType cet) {
+
+		val referencedModule = cet.module;
+		val referencedExamType = cet.examType
+		
+		if (!referencedModule.examTypes.contains(referencedExamType)) {
+			error('Exam type is not allowed by the references module', cet, CurriculumModelPackage.Literals.CONCRETE_EXAM_TYPE__EXAM_TYPE)
+		}
+	}
+	
+	// "The value of a concrete exam type should be in range of the allowed exam type"
+	@Check
+	def checkExamTypeValue(ConcreteExamType cet) {
+		val rangeLower = cet.examType.getLowerBound()
+		val rangeUpper = cet.examType.getUpperBound()
+		val value = cet.getValue()
+		
+		if (value < rangeLower || value > rangeUpper) {
+			error('Value is not in range of ' + rangeLower + ' and ' + rangeUpper, cet, CurriculumModelPackage.Literals.CONCRETE_EXAM_TYPE__VALUE)
+		}
+	}
+	
+	// "The semester of a curriculum entry should be in range of the study section of the referenced module"
+	@Check
+	def checkSemesterOfCurriculumEntry(CurriculumEntry cEntry) {
+		val semester = cEntry.getSemester()
+		val studySection = cEntry.studySection
+		val firstSemester = studySection.firstSemester
+		val lastSemester = studySection.lastSemester
+		
+		if (semester < firstSemester || semester > lastSemester) {
+			error('The semester of a curriculum entry should be in range of the study section of the referenced module', cEntry, CurriculumModelPackage.Literals.CURRICULUM_ENTRY__SEMESTER)
+		}	
+	}
+	
+	// "The course type of a curriculum entry must be defined in the referenced module."
+	@Check
+	def checkCourseTypeCurriculum(CurriculumEntry cEntry) {
+		val possibleCourseTypes = cEntry.moduleSpecification.module.courseTypes
+		val actualCourseTypes = cEntry.moduleSpecification.courseTypes
+		
+		for (var int i = 0; i < actualCourseTypes.size(); i++) {
+			if (!possibleCourseTypes.contains(actualCourseTypes.get(i)))
+				error('The referenced module does not contain course type', cEntry, CurriculumModelPackage.Literals.CURRICULUM__YEAR)
+		}
+	}	
 }

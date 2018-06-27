@@ -20,6 +20,7 @@ Curriculum:
 
 CurriculumEntry:
 	'Eintrag' '[' name=ID ']'
+	'-' 'Semester' semester=INT
 	'-' 'Turnus' rota=Rota
 	moduleSpecification=ModuleSpecification
 	('-' 'Hilfsmittel' ((customAids+=STRING)|(aids+=[Aid|FQN])) (',' ((customAids+=STRING)|(aids+=[Aid|FQN])))*)?
@@ -27,10 +28,10 @@ CurriculumEntry:
 ;
 
 ModuleSpecification:
-	'-' 'Modul' module=[ser::Module]
+	'-' 'Modul' module=[ser::Module|FQN]
 	('-' 'Konkreter_Name' completeName=STRING
 	'-' 'Details' details=[glossary::GlossaryEntry|FQN])?
-	'-' 'Leistungsnachweis' (concreteExamTypes+=ConrecteExamType) (',' concreteExamTypes+=ConrecteExamType)*
+	'-' 'Leistungsnachweis' (concreteExamTypes+=ConcreteExamType) (',' concreteExamTypes+=ConcreteExamType)*
 	'-' 'Lehrveranstaltungsart' (courseTypes+=[ser::CourseTypeDeclaration|FQN]) (',' courseTypes+=[ser::CourseTypeDeclaration|FQN])*
 ;
 
@@ -44,7 +45,7 @@ AidList:
 	']'
 ;
 
-ConrecteExamType:
+ConcreteExamType:
 	examType=[ser::ExamType|FQN] '(' value=INT ')'
 ;
 
@@ -53,7 +54,7 @@ enum Semester:
 ;
 
 enum Rota:
-	YEARLY='jährlich' | HALF_YEARLY='halbjährlich'
+	YEARLY='jaehrlich' | HALF_YEARLY='halbjaehrlich'
 ;
 
 FQN: ID (('.') ID)*;

@@ -3,6 +3,8 @@
  */
 package de.hs_coburg.mgse.platform.modulehandbook.validation
 
+import org.eclipse.xtext.validation.Check
+import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleHandbookModelPackage
 
 /**
  * This class contains custom validation rules. 
@@ -21,5 +23,60 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 //					INVALID_NAME)
 //		}
 //	}
+
+
+	// "The effort for a workload must be greater than 0."
+	@Check
+	def checkEffort(Workload workload) {
+		val effort = workload.effort
+		if (effort <= 0) {
+			error('The effort for a workload must be greater than 0', workload, ModuleHandbookModelPackage.Literals.CURRICULUM__VERSION)
+		}
+	}
 	
+	// "The overall effort for all workloads defined in a module description must to be equal to the semester hours specified in the module."
+	@Check
+	def checkOverallEffort(ModuleDescription md) {
+		val workloads = md.getWorkload()
+		val moduleEffort = md.curriculumEntry.moduleSpecification.module.getSemesterHour()
+		var int effortSum = 0;
+		
+		for (var int i = 0; i < workloads.size(); i++) {
+			effortSum += workloads.get(i).getEffort()
+		}
+		
+		if (moduleEffort != effortSum) {
+			error('The effort for a workload must be greater than 0', workload, ModuleHandbookModelPackage.Literals.CURRICULUM__VERSION)
+		}
+	}
+	
+	// TODO
+	// "Only modules which are specified in the referenced curriculum entry can be described in the module handbook."
+	//Context: ModuleHandbook
+	//	let possibleEntries = self.curriculum.curriculumEntries
+	//	let actualReferencedEntries = self.moduleDescriptions.curriculumEntry
+	//	inv: possibleEntries -> includeAll(actualReferencedEntries)
+	@Check
+	def checkSpecifiedModule(ModuleHandbook mhb) {
+		val possibleEntries = mhb.curriculum.curriculumEntries
+		val actualReferencedEntries = mhb.moduleDescriptions.curriculumEntry
+		
+		for (var int i = 0; i < possibleEntries.size(); i++) {
+			
+		}
+		
+		
+		
+		
+		for (var int i = 0; i < actualReferencedEntries.size(); i++) {
+			if (!possibleEntries.contains(actualReferencedEntries.get(i)))
+				error('Only modules which are specified in the referenced curriculum entry can be described in the module handbook', mhb, ModuleHandbookModelPackage.Literals.CURRICULUM__YEAR)
+		}
+
+		
+		
+		
+		
+		
+	}
 }

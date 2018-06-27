@@ -1,13 +1,14 @@
-Studienplan [SS_18_IF_B]: "Studienplan fÃ¼r Sommersemester 2018, Informatik Bachelor"
+Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
 SPO SPO_B_IF
 Version 1
 Semester Sommersemester 1
 
 Eintraege [
 	Eintrag [E1]
-	- Turnus jährlich
-	- Modul Prog1
-	- Leistungsnachweis Prog1.schrPr (90)
+	- Semester 2
+	- Turnus jaehrlich
+	- Modul SPO_B_IF.Prog1
+	- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
 	- Lehrveranstaltungsart Pr, SU
 	- Pruefer EIF.TB, EIF.JEB
 	

@@ -3,6 +3,10 @@
  */
 package de.hs_coburg.mgse.platform.course.validation
 
+import org.eclipse.xtext.validation.Check
+import de.hs_coburg.mgse.platform.course.courseModel.CourseOfStudies
+import de.hs_coburg.mgse.platform.course.courseModel.CourseModelPackage
+
 /**
  * This class contains custom validation rules. 
  *
@@ -20,5 +24,22 @@ class CourseModelValidator extends AbstractCourseModelValidator {
 //					INVALID_NAME)
 //		}
 //	}
+
+	// "The ECTS of a course of studies must be greater than 1."
+	@Check
+	def checkECTS(CourseOfStudies cos) {
+		val ects = cos.getEcts();
+		if(ects <= 0) {
+			error('Negative ECTS Value', cos, CourseModelPackage.Literals.COURSE_OF_STUDIES__ECTS);
+		}
+	}
 	
+	// "The total semester of a course of studies must be greater than 1."
+	@Check
+	def checkSemester(CourseOfStudies cos) {
+		val sem = cos.getSemester();
+		if(sem <= 0) {
+			error('Negative Semester Value', cos, CourseModelPackage.Literals.COURSE_OF_STUDIES__SEMESTER);
+		}
+	}
 }

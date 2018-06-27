@@ -5,7 +5,7 @@ import 'http://www.hs_coburg.de/mgse/platform/glossary/GlossaryModel' as glossar
 import 'http://www.hs_coburg.de/mgse/platform/course/CourseModel' as course
 
 Model:
-	StudyExaminationRegulations | Module | ExamTypeDeclarationList | CourseTypeDeclarationList
+	StudyExaminationRegulations | ExamTypeDeclarationList | CourseTypeDeclarationList
 ;
 
 CourseTypeDeclarationList:
@@ -42,7 +42,7 @@ StudySection:
 	'Endsemester' lastSemester=INT
 	'Bezeichnung' completeName=STRING
 	'Modules' '['
-		(modules+=[Module|FQN])+
+		(modules+=Module)+
 	']' 
 ;
 
