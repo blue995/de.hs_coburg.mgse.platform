@@ -62,6 +62,7 @@ class CurriculumModelParsingTest {
 				- Modul SPO_B_IF.Prog1
 				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
 				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
 				- Pruefer EIF.TB, EIF.JEB
 			]
 		''')
@@ -83,6 +84,7 @@ class CurriculumModelParsingTest {
 				- Modul SPO_B_IF.Prog1
 				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
 				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
 				- Pruefer EIF.TB, EIF.JEB
 				
 				Eintrag [E2]
@@ -91,6 +93,7 @@ class CurriculumModelParsingTest {
 				- Modul SPO_B_IF.GI
 				- Leistungsnachweis SPO_B_IF.GI.schrPr (90)
 				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
 				- Pruefer EIF.HS
 			]
 		''')
@@ -113,6 +116,28 @@ class CurriculumModelParsingTest {
 	}
 	
 	@Test
+	def void providedSemesterEnumIsRequired() {
+		val result = parseHelper.parse('''
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester FalschesSemesterEnum 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus jaehrlich
+				- Modul SPO_B_IF.Prog1
+				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
+				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
+				- Pruefer EIF.TB, EIF.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
 	def void entryNameIsRequired() {
 		val result = parseHelper.parse('''
 			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
@@ -126,6 +151,7 @@ class CurriculumModelParsingTest {
 				- Modul SPO_B_IF.Prog1
 				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
 				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
 				- Pruefer EIF.TB, EIF.JEB
 			]
 		''')
@@ -146,6 +172,7 @@ class CurriculumModelParsingTest {
 				- Modul SPO_B_IF.Prog1
 				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
 				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
 				- Pruefer EIF.TB, EIF.JEB
 			]
 		''')
@@ -166,6 +193,7 @@ class CurriculumModelParsingTest {
 				- Modul SPO_B_IF.Prog1
 				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
 				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
 				- Pruefer EIF.TB, EIF.JEB
 			]
 		''')
@@ -186,6 +214,7 @@ class CurriculumModelParsingTest {
 				- Turnus jaehrlich
 				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
 				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
 				- Pruefer EIF.TB, EIF.JEB
 			]
 		''')
@@ -214,7 +243,179 @@ class CurriculumModelParsingTest {
 	}
 	
 	@Test
-	def void loadAidlist() {
+	def void entryTesterIsRequired() {
+		val result = parseHelper.parse('''
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester Sommersemester 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus jaehrlich
+				- Modul SPO_B_IF.Prog1
+				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
+				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void entryProvidedRotaEnumIsRequired() {
+		val result = parseHelper.parse('''
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester Sommersemester 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus falschesRotaEnum
+				- Modul SPO_B_IF.Prog1
+				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
+				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
+				- Pruefer EIF.TB, EIF.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void moduleSpecificationModuleIsRequired() {
+		val result = parseHelper.parse('''
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester Sommersemester 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus jaehrlich
+				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
+				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
+				- Pruefer EIF.TB, EIF.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void moduleSpecificationCourseExamTypeIsRequired() {
+		val result = parseHelper.parse('''
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester Sommersemester 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus jaehrlich
+				- Modul SPO_B_IF.Prog1
+				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
+				- Pruefer EIF.TB, EIF.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void moduleSpecificationCourseTypeIsRequired() {
+		val result = parseHelper.parse('''
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester Sommersemester 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus jaehrlich
+				- Modul SPO_B_IF.Prog1
+				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
+				- Pruefer EIF.TB, EIF.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void moduleSpecificationCompleteNameIsOptional() {
+		val result = parseHelper.parse('''
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester Sommersemester 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus jaehrlich
+				- Modul SPO_B_IF.Prog1
+				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
+				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
+				- Pruefer EIF.TB, EIF.JEB
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void moduleSpecificationNeedsAtLeastOneCourseType() {
+		val result = parseHelper.parse('''
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester Sommersemester 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus jaehrlich
+				- Modul SPO_B_IF.Prog1
+				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
+				- Lehrveranstaltungsart
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
+				- Pruefer EIF.TB, EIF.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void moduleSpecificationNeedsAtLeastOneExamType() {
+		val result = parseHelper.parse('''
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester Sommersemester 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus jaehrlich
+				- Modul SPO_B_IF.Prog1
+				- Leistungsnachweis
+				- Lehrveranstaltungsart Pr, SU
+				- Hilfsmittel nTR, amE, "Selbstgeschriebene Formelsammlung"
+				- Pruefer EIF.TB, EIF.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void aidlistIsGenerated() {
 		val result = parseHelper.parse('''
 			Hilfsmittel [
 				- [nTR]: "Nicht programmierbarer Taschenrechner"
@@ -222,6 +423,46 @@ class CurriculumModelParsingTest {
 			]
 		''')
 		assertNotNull(result)
+	}
+	
+	@Test
+	def void aidListHasNoErrorsWithSingleEntry() {
+		val result = parseHelper.parse('''
+			Hilfsmittel [
+				- [amE]: "Alles mit Einschränkungen"
+			]
+		''')
 		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void aidListHasNoErrorsWithMultipleEntries() {
+		val result = parseHelper.parse('''
+			Hilfsmittel [
+				- [nTR]: "Nicht programmierbarer Taschenrechner"
+				- [amE]: "Alles mit Einschränkungen"
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void aidListNeedsAtLeastOneEntry() {
+		val result = parseHelper.parse('''
+			Hilfsmittel [
+
+			]
+		''')
+		assertNull(result)
+	}
+	
+	@Test
+	def void aidListAidNeedsFullyQualifiedName() {
+		val result = parseHelper.parse('''
+			Hilfsmittel [
+				- "Nicht programmierbarer Taschenrechner"
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
 	}
 }
