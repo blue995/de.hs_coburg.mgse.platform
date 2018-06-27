@@ -15,9 +15,6 @@ Eintraege [
 			
 			Beschreibung "Eigenarbeit (30h Vor- und Nachbereitung des Lehrstoffs, 30h Lösung von Übungsaufgaben, 30h Prüfungsvorbereitung)"
 			Aufwand	90
-			
-			Beschreibung "Gesamt"
-			Aufwand	120
 	]
 	Zulassungsvorraussetzungen [
 		Vorraussetzung "keine"
@@ -40,9 +37,6 @@ Eintraege [
 			
 			Beschreibung "Eigenarbeit (Nachbereitung Seminaristischer Unterricht: 40 h, Übung: 30 h, Prüfungsvorbereitung: 50 h)"
 			Aufwand	120
-			
-			Beschreibung "Gesamt"
-			Aufwand	210
 	]
 	Zulassungsvorraussetzungen [
 		Vorraussetzung "keine"

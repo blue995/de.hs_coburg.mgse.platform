@@ -14,6 +14,15 @@ class ModuleBehavior {
 			return module.ects
 	}
 	
+	def calculateSemesterHours(Module module) {
+		
+		if (module.isAbstract) {
+			return module.semesterHours * module.count
+		}
+		else
+			return module.semesterHours
+	}
+	
 	def isAbstract(Module module) {
 		// details --> concrete
 		// count --> abstract

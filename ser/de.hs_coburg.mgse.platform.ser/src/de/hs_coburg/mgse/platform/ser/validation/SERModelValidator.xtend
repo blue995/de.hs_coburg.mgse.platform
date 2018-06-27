@@ -52,13 +52,13 @@ class SERModelValidator extends AbstractSERModelValidator {
 	}
 	
 	// "The semester hours of a module are ECTS * 1.5"
-	@Check
-	def checkSemesterHours(Module module) {
-		val semesterHours = module.getSemesterHours()
-		val ects = module.getEcts()
-		if (semesterHours != ects * 1.5)
-			error('The semester hours of a module are ECTS * 1.5', module, SERModelPackage.Literals.MODULE__SEMESTER_HOURS)
-	}
+//	@Check
+//	def checkSemesterHours(Module module) {
+//		val semesterHours = module.getSemesterHours()
+//		val ects = module.getEcts()
+//		if (semesterHours != ects * 1.5)
+//			error('The semester hours of a module are ECTS * 1.5', module, SERModelPackage.Literals.MODULE__SEMESTER_HOURS)
+//	}
 	
 	// "The count of an abstract module should be greater than 0."
 	@Check

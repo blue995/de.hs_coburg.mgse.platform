@@ -5,7 +5,7 @@ Semester Sommersemester 1
 
 Eintraege [
 	Eintrag [E1]
-	- Semester 2
+	- Semester 1
 	- Turnus jaehrlich
 	- Modul SPO_B_IF.Prog1
 	- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
@@ -13,9 +13,10 @@ Eintraege [
 	- Pruefer EIF.TB, EIF.JEB
 	
 	Eintrag [E2]
-	- Turnus jährlich
-	- Modul GI
-	- Leistungsnachweis GI.schrPr (90)
+	- Semester 2
+	- Turnus jaehrlich
+	- Modul SPO_B_IF.GI
+	- Leistungsnachweis SPO_B_IF.GI.schrPr (90)
 	- Lehrveranstaltungsart Pr, SU
 	- Pruefer EIF.HS
 ]

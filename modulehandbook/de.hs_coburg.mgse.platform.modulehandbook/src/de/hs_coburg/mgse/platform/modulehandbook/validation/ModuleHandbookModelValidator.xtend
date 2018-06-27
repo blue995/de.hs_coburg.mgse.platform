@@ -5,6 +5,11 @@ package de.hs_coburg.mgse.platform.modulehandbook.validation
 
 import org.eclipse.xtext.validation.Check
 import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleHandbookModelPackage
+import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.Workload
+import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleDescription
+import de.hs_coburg.mgse.platform.ser.validation.ModuleBehavior
+import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleHandbook
+import de.hs_coburg.mgse.platform.modulehandbook.utils.ModuleDescriptionBehavior
 
 /**
  * This class contains custom validation rules. 
@@ -12,7 +17,8 @@ import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleHandb
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator {
-	
+	extension ModuleBehavior = new ModuleBehavior
+	extension ModuleDescriptionBehavior = new ModuleDescriptionBehavior
 //	public static val INVALID_NAME = 'invalidName'
 //
 //	@Check
@@ -30,23 +36,19 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 	def checkEffort(Workload workload) {
 		val effort = workload.effort
 		if (effort <= 0) {
-			error('The effort for a workload must be greater than 0', workload, ModuleHandbookModelPackage.Literals.CURRICULUM__VERSION)
+			error('The effort for a workload must be greater than 0', workload, ModuleHandbookModelPackage.Literals.WORKLOAD__EFFORT)
 		}
 	}
 	
 	// "The overall effort for all workloads defined in a module description must to be equal to the semester hours specified in the module."
 	@Check
 	def checkOverallEffort(ModuleDescription md) {
-		val workloads = md.getWorkload()
-		val moduleEffort = md.curriculumEntry.moduleSpecification.module.getSemesterHour()
-		var int effortSum = 0;
-		
-		for (var int i = 0; i < workloads.size(); i++) {
-			effortSum += workloads.get(i).getEffort()
-		}
+		val workloads = md.workloads
+		val moduleEffort = md.calculateMaxWorkload
+		var int effortSum = workloads.map[wl | wl.effort].reduce[s1, s2 | s1 + s2]
 		
 		if (moduleEffort != effortSum) {
-			error('The effort for a workload must be greater than 0', workload, ModuleHandbookModelPackage.Literals.CURRICULUM__VERSION)
+			error('''The overall effort for all workloads must be equal to «moduleEffort» but actually is «effortSum»''', md, ModuleHandbookModelPackage.Literals.MODULE_DESCRIPTION__WORKLOADS)
 		}
 	}
 	
@@ -58,8 +60,9 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 	//	inv: possibleEntries -> includeAll(actualReferencedEntries)
 	@Check
 	def checkSpecifiedModule(ModuleHandbook mhb) {
+		// TODO-ks : Not done yet
 		val possibleEntries = mhb.curriculum.curriculumEntries
-		val actualReferencedEntries = mhb.moduleDescriptions.curriculumEntry
+		val actualReferencedEntries = mhb.moduleDescriptions.map[md | md.curriculumEntry]
 		
 		for (var int i = 0; i < possibleEntries.size(); i++) {
 			
@@ -67,12 +70,12 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 		
 		
 		
-		
+		/* 
 		for (var int i = 0; i < actualReferencedEntries.size(); i++) {
 			if (!possibleEntries.contains(actualReferencedEntries.get(i)))
 				error('Only modules which are specified in the referenced curriculum entry can be described in the module handbook', mhb, ModuleHandbookModelPackage.Literals.CURRICULUM__YEAR)
 		}
-
+		*/
 		
 		
 		
