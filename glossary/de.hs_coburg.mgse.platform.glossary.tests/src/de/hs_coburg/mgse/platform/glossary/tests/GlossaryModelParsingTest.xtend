@@ -21,9 +21,31 @@ class GlossaryModelParsingTest {
 	@Test
 	def void loadModel() {
 		val result = parseHelper.parse('''
-			Hello Xtext!
+			Glossar Begriffe
+			
+			Sektion "Abschlüsse"
+				[Master_of_Science]
+				Wort: "Master of Science"
+				Bedeutung: "Masterabschluss eines naturwissenschaftlichen Studienganges"
+				Abkuerzung: "M.Sc."
+				
+				[Master_of_Arts]
+				Wort: "Master of Arts"
+				Bedeutung: "Masterabschluss eines geistes-, kultur-, sozial- oder wirtschaftswissenschaftlichen Studienganges"
+				Abkuerzung: "M.A."
+				
+				[Master_of_BA]
+				Wort: "Master of Business Administration"
+				Bedeutung: "Masterabschluss eines Studienganges, welcher hauptsächlich Managementkompetenzen vermittelt."
+				Abkuerzung: "MBA"
+					
+				[Bachelor_of_Science]
+				Wort: "Bachelor of Science"
+				Bedeutung: "Bachelorabschluss eines naturwissenschaftlichen Studienganges"
+				Abkuerzung: "B.Sc."
+			Ende
 		''')
-		//Assert.assertNotNull(result)
-		//Assert.assertTrue(result.eResource.errors.isEmpty)
+		Assert.assertNotNull(result)
+		Assert.assertTrue(result.eResource.errors.isEmpty)
 	}
 }

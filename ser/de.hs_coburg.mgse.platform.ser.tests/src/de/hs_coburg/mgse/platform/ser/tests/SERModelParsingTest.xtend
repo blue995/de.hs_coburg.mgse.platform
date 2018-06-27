@@ -19,9 +19,164 @@ class SERModelParsingTest {
 	ParseHelper<Model> parseHelper
 	
 	@Test
-	def void loadModel() {
+	def void loadExamTypeDeclarationList() {
 		val result = parseHelper.parse('''
-			Hello Xtext!
+			Pruefungsarten [
+				Typ schrPr
+				Details Begriffe.schrPr
+				Einheit "Minuten"
+			]
+		''')
+		Assert.assertNotNull(result)
+		Assert.assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void loadCourseTypeDeclarationList() {
+		val result = parseHelper.parse('''
+			Lehrveranstaltungsarten [
+				Typ SU // Seminaristischer Unterricht
+				Details Begriffe.SU
+				
+				Typ UE // Übung
+				Details Begriffe.UE
+				
+				Typ V // Lehrvortrag
+				Details Begriffe.V
+				
+				Typ Pr // Praktikum
+				Details Begriffe.Pr
+			]
+		''')
+		Assert.assertNotNull(result)
+		Assert.assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void loadStudyExaminationRegulations() {
+		val result = parseHelper.parse('''
+			SPO
+				SPO_B_IF
+			Studiengang
+				EIF.IF_B
+			Version
+				1
+			Gueltigkeitsdatum
+				01. April 2018
+			Titel 
+				"Studien- und Prüfungsordnung für den Bachelorstudiengang Informatik 
+				an der Hochschule für angewandte Wissenschaften Coburg (SPO B IF)"
+			Vorwort
+				"Auf Grund von Art.13 Abs.1, 43, 44, 58 Abs.1, 61 Abs.2 und 8 und 66 des Bayerischen Hochschulgesetzes
+				–BayHSchG– (BayRS 2210–1–1–WFK) erlässt die Hochschule für angewandte
+				Wissenschaften Coburg folgende Satzung"
+			
+			Paragraphen [
+				Start
+					§ 1
+					Titel "Zweck der Studienâ€“ und PrÃ¼fungsordnung"
+					- 	"Diese Studienâ€“ und PrÃ¼fungsordnung regelt den Bachelorstudiengang Informatik an der
+						Hochschule fÃ¼r angewandte Wissenschaften Coburg"
+					-	"Sie dient der AusfÃ¼llung und ErgÃ¤nzung der RahmenprÃ¼fungsordnung fÃ¼r die
+						Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210â€“4â€“1â€“4â€“1 WFK) und der
+						Allgemeinen PrÃ¼fungsordnung der Hochschule fÃ¼r angewandte Wissenschaften Coburg
+						(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+				Ende
+				
+				Start
+					§ 2
+					Titel "Studienziel"
+					- "Ziel des Bachelorstudiums ist die Vermittlung der Befähigung zur selbständigen Anwendung
+						wissenschaftlicher Erkenntnisse und Methoden in der Informatik."
+					- "Der Breite und Vielfalt der Informatik wird durch eine umfassende Grundlagenausbildung sowie
+						der Spezialisierungsmöglichkeit in eine der angebotenen Vertiefungsrichtungen Rechnung getragen."
+					- "Das Studium soll dazu befähigen, sich rasch in eines der zahlreichen Anwendungsgebiete einzuarbeiten, sich neue
+						Gebiete zu erschließen und sich selbständig weiterzubilden."
+					- "Der Bachelorabschluss befähigt insbesondere zur Übernahme anwendungsorientierter
+						Fach– und Führungsaufgaben im Bereich der Informatik." 
+					- "Der erfolgreiche Abschluss soll es ermöglichen, das Studium in einem Masterstudiengang nationaloder international fortzusetzen."
+				Ende
+				
+				Start
+					§ 3
+					Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
+					§§ 1
+					- "Die Regelstudienzeit beträgt sieben Studiensemester."
+					§§ 2
+					- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+					§§ 3
+					- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
+						in denen ein bestimmtes Fachgebiet vertieft wird."
+					- "Module einer Vertiefungsrichtung werden als fachwissenschaftliche Wahlpflichtmodule 
+						nach Maßgabe des Studien- und Prüfungsplans
+						ab dem dritten Studiensemester geführt."
+					- "Als Vertiefungsrichtungen werden angeboten:"
+				Ende
+			]
+			Fussnoten [
+				[F1]: 	"Die nähere Festlegung erfolgt durch die Fakultät im Studien– und Prüfungsplan"
+				[F2]: 	"Ein ECTS-Punkt entspricht generell einem Arbeitsaufwand von 30 Arbeitsstunden."
+				[F3]: 	"Soweit mehrere Prüfungsformen eingetragen sind, wird Art und Umfang der jeweiligen
+						Prüfung im Studien– und Prüfungsplan festgelegt."
+				[F4]: 	"Aus der in sich geschlossenen Wahlpflichtmodulgruppe sind mindestens drei Module
+						zu wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan."
+				[F5]: 	"Aus der in sich abgeschlossenen Wahlpflichtmodulgruppe sind neun Module zu
+						wählen. Nähere Regelungen trifft der Studien– und Prüfungsplan. Die Fakultät kann
+						am Ende des vierten Studiensemesters ein Wahlverfahren zu zulässigen Wahlpflichtkombinationen
+						durchführen, mit dem das tatsächlich wählbare Angebot ab einer
+						bestimmten Mindestteilnehmerzahl ermittelt wird."
+				[F6]: 	"Für den Erst– und den Wiederholungsversuch der Bachelorarbeit ist der Besuch des
+						begleitenden Bachelorseminars verpflichtend. Dabei soll der Studierende Fragestellung,
+						Bearbeitungsansätze und –methoden sowie die Ergebnisse seiner Bachelorarbeit
+						darstellen und vertreten. Bei Wiederholung der Bachelorarbeit ist die Endnote
+						des zugehörigen Bachelorseminars maßgebend."
+				[F7]: 	"Prädikatsnoten mit Erfolg / ohne Erfolg abgelegt."
+				[F8]: 	"Sofern ein Modul mit einer schrP abschließt, kann der Studien- und Prüfungsplan
+						für dieses Modul festlegen, dass darin freiwillig studienbegleitend eine prStA abgelegt
+						werden kann. Wurde die schrP bestanden, werden die für die studienbegleitende
+						prStA erreichten Punkte auf die in der schrP erreichten Punkte im Umfang
+						von max. 10% der in der schrP erreichbaren Punkte addiert. Eine Wiederholung
+						der studienbegleitenden prStA bei einem Versäumen infolge nicht zu vertretender
+						Gründe findet nicht statt. Bei Wiederholung der schriftlichen Prüfung werden die
+						erreichten Punkte der studienbegleitenden prStA nicht angerechnet. Näheres regelt
+						der Studien- und Prüfungsrplan."
+			]
+			Studienabschnitte [
+				Startsemester 1
+				Endsemester 2
+				Bezeichnung "Theoretisches Fachsemester"
+				Modules [
+					Modul Prog1
+					ECTS 5
+					Gewichtung 2.2
+					SWS 4
+					Modulart "Pflichtmodul"
+					Details Begriffe.Prog1
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]
+					
+					Modul GI
+					ECTS 7
+					Gewichtung 2.2
+					SWS 6
+					Modulart "Pflichtmodul"
+					Details Begriffe.GI
+					Pruefungsarten [
+						Name schrPr
+						Pruefungsart schrPr [ 90 bis 120 ]
+					]
+					Lehrveranstaltungsarten[
+						Pr, SU, UE, V
+					]   
+				]
+				
+				
+			]
 		''')
 		//Assert.assertNotNull(result)
 		//Assert.assertTrue(result.eResource.errors.isEmpty)

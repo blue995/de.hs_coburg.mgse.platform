@@ -19,11 +19,44 @@ class CurriculumModelParsingTest {
 	ParseHelper<Model> parseHelper
 	
 	@Test
-	def void loadModel() {
+	def void loadCurriculum() {
 		val result = parseHelper.parse('''
-			Hello Xtext!
+			Studienplan [SS_18_IF_B]: "Studienplan für Sommersemester 2018, Informatik Bachelor"
+			SPO SPO_B_IF
+			Version 1
+			Semester Sommersemester 1
+			
+			Eintraege [
+				Eintrag [E1]
+				- Semester 1
+				- Turnus jaehrlich
+				- Modul SPO_B_IF.Prog1
+				- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
+				- Lehrveranstaltungsart Pr, SU
+				- Pruefer EIF.TB, EIF.JEB
+				
+				Eintrag [E2]
+				- Semester 2
+				- Turnus jaehrlich
+				- Modul SPO_B_IF.GI
+				- Leistungsnachweis SPO_B_IF.GI.schrPr (90)
+				- Lehrveranstaltungsart Pr, SU
+				- Pruefer EIF.HS
+			]
 		''')
-		//Assert.assertNotNull(result)
-		//Assert.assertTrue(result.eResource.errors.isEmpty)
+		Assert.assertNotNull(result)
+		Assert.assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void loadAidlist() {
+		val result = parseHelper.parse('''
+			Hilfsmittel [
+				- [nTR]: "Nicht programmierbarer Taschenrechner"
+				- [amE]: "Alles mit Einschränkungen"
+			]
+		''')
+		Assert.assertNotNull(result)
+		Assert.assertTrue(result.eResource.errors.isEmpty)
 	}
 }

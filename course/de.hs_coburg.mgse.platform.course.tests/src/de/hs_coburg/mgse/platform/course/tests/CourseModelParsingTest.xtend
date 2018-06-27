@@ -19,11 +19,82 @@ class CourseModelParsingTest {
 	ParseHelper<Model> parseHelper
 	
 	@Test
-	def void loadModel() {
+	def void loadFaculty() {
 		val result = parseHelper.parse('''
-			Hello Xtext!
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [TB]
+				- Vorname "Tobias"
+				- Nachname "BlaufuÃŸ"
+				- Email "tobias.blaufuss@stud.hs-coburg.de"
+				- Raum "Oben"
+				- Kuerzel Begriffe.TB
+				
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+				
+				Professor [HS]
+				- Vorname "Hakan"
+				- Nachname "Senkaya"
+				- Email "hakan.senkaya@stud.hs-coburg.de"
+				- Raum "Noch weiter oben"
+				- Kuerzel Begriffe.HS
+			]
 		''')
-		//Assert.assertNotNull(result)
-		//Assert.assertTrue(result.eResource.errors.isEmpty)
+		Assert.assertNotNull(result)
+		Assert.assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void loadDegreeList() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		Assert.assertNotNull(result)
+		Assert.assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void loadAdmissionRequirementList() {
+		val result = parseHelper.parse('''
+			Zulassungsvoraussetzungen [
+			- [AHR]: "Allgemeine Hochschulreife"
+			- [FHR]: "Fachhochschulreife"
+			- [BSc]: "Bachelor of Science"
+			]
+		''')
+		Assert.assertNotNull(result)
+		Assert.assertTrue(result.eResource.errors.isEmpty)
 	}
 }
