@@ -1,0 +1,54 @@
+Studienplan SS_18_IF_B
+
+Version 2
+
+Eintraege [
+	Start
+	Modul SS_18_IF_B.E1
+	Verantwortlicher EIF.HS
+	Dozent EIF.HS, EIF.JEB, EIF.TB
+	Sprache "deutsch"
+	Qualifikationsziele "Fachlich-methodische Kompetenzen: Studierende sollen ..."
+	Arbeitsaufwand [
+			Beschreibung "Präsenz  (30 h Seminaristischer Unterricht, 30 h Übung)"
+			Aufwand	60
+			
+			Beschreibung "Eigenarbeit (30h Vor- und Nachbereitung des Lehrstoffs, 30h Lösung von Übungsaufgaben, 30h Prüfungsvorbereitung)"
+			Aufwand	90
+			
+			Beschreibung "Gesamt"
+			Aufwand	120
+	]
+	Zulassungsvorraussetzungen [
+		Vorraussetzung "keine"
+	]
+	Lerninhalte "Einführung, Datentypen und Ausdrücke, Kontrollstrukturen, Arrays und Zeiger, Prozedurale Programmierung, Rekursion, Objektorientierte Programmierung – Teil 1, Strings, Exception Handling"
+	Medienformen "Tafel", "Skript"
+	Literatur "Ullenboom, Christian: Java ist auch eine Insel, Galileo Computing jeweils in der neusten Auflage"
+	Ende
+	
+	
+	Start		   
+	Modul SS_18_IF_B.E2
+	Verantwortlicher EIF.HS
+	Dozent EIF.HS
+	Sprache "deutsch"
+	Qualifikationsziele "Fachlich-methodische Kompetenzen: Studierende sollen ..."
+	Arbeitsaufwand [
+			Beschreibung "Präsenz (Seminaristischer Unterricht: 60 h, Übung: 60 h)"
+			Aufwand	90
+			
+			Beschreibung "Eigenarbeit (Nachbereitung Seminaristischer Unterricht: 40 h, Übung: 30 h, Prüfungsvorbereitung: 50 h)"
+			Aufwand	120
+			
+			Beschreibung "Gesamt"
+			Aufwand	210
+	]
+	Zulassungsvorraussetzungen [
+		Vorraussetzung "keine"
+	]
+	Lerninhalte "Einführung, vom Problem zur Softwarelösung, Konzepte von Programmiersprachen, elementare Algorithmen, übersetzung von Programmiersprachen"
+	Medienformen "Tafel", "Skript"
+	Literatur "H.-P. Gumm, M. Sommer: Einführung in die Informatik, Oldenbourg Verlag, München / Wien, 10. Auflage, 2012"
+	Ende
+]

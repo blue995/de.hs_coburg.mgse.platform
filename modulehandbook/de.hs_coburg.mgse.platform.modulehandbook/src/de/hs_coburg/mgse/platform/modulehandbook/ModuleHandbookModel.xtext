@@ -7,7 +7,40 @@ import 'http://www.hs_coburg.de/mgse/platform/ser/SERModel' as ser
 import 'http://www.hs_coburg.de/mgse/platform/curriculum/CurriculumModel' as curriculum
 
 Model:
-	greetings+=Greeting*;
+	ModuleHandbook;
 	
-Greeting:
-	'Hello' name=ID '!';
+ModuleHandbook:
+	'Studienplan' curriculum=[curriculum::Curriculum|FQN]
+	'Version' version=INT
+	'Eintraege' '['
+		(moduleDescriptions+=ModuleDescription)+
+	']'
+;
+
+ModuleDescription:
+	'Start'
+	'Modul' curriculumEntry=[curriculum::CurriculumEntry|FQN]
+	'Verantwortlicher' responsible=[course::Professor|FQN]
+	'Dozent' (lectures+=[course::Professor|FQN]) (',' lectures+=[course::Professor|FQN])*
+	'Sprache' language=STRING
+	'Qualifikationsziele' qualificationGoals=STRING
+	'Arbeitsaufwand' '[' (workloads+=Workload)+ ']'
+	'Zulassungsvorraussetzungen' '[' (admissionRequirements+=ModuleAdmissionRequirement)+ ']'
+	'Lerninhalte' content=STRING
+	'Medienformen' (medias+=STRING) (',' medias+=STRING)*
+	'Literatur' literature=STRING
+	'Ende'
+;
+
+Workload:
+	'Beschreibung' description=STRING
+	'Aufwand' effort=INT
+;
+
+ModuleAdmissionRequirement:
+	'Vorraussetzung' text=STRING
+	('Paragraph' paragraph=[ser::Paragraph])?
+;
+
+
+FQN: ID (('.') ID)*;

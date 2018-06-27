@@ -7,6 +7,15 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+//import org.eclipse.xtext.naming.IQualifiedNameProvider
+
+//import com.google.inject.Inject
+
+import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleHandbook
+//import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleDescription
+//import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.Workload
+//import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleAdmissionRequirement
+
 
 /**
  * Generates code from your model files on save.
@@ -14,12 +23,98 @@ import org.eclipse.xtext.generator.IGeneratorContext
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
  */
 class ModuleHandbookModelGenerator extends AbstractGenerator {
-
+	
+	//@Inject extension IQualifiedNameProvider
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(Greeting)
-//				.map[name]
-//				.join(', '))
+		
+//		for(e: resource.allContents.toIterable.filter(ModuleHandbook)) {
+//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.compile);
+//		}
+
+		for(e: resource.allContents.toIterable.filter(ModuleHandbook)) {
+			fsa.generateFile(
+				"ModuleHandbookModelCreator.java",
+            	e.compile
+			)
+		}
 	}
+	
+	def compile(ModuleHandbook mh) ''' 
+		package de.hs_coburg.mgse.modelcreator;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		import java.util.ArrayList;
+		import java.util.List;
+		
+		import de.hs_coburg.mgse.persistence.model.ModuleHandbook;
+		import de.hs_coburg.mgse.persistence.model.ModuleDescription;
+		import de.hs_coburg.mgse.persistence.model.Workload;
+		import de.hs_coburg.mgse.persistence.model.ModuleAdmissionRequirement;
+		
+		import de.hs_coburg.mgse.persistence.model.Curriculum;
+		import de.hs_coburg.mgse.persistence.model.ModuleSpecification;
+		import de.hs_coburg.mgse.persistence.model.Professor;
+		
+		
+		public class ModuleHandbookModelCreator {
+			public static boolean createModel() {
+		        boolean result = true;
+		        
+		        try {
+		            EntityManager em = HibernateUtil.getEntityManager();
+		            em.getTransaction().begin();
+		            
+		            ModuleHandbook module_handbook = new ModuleHandbook();
+		            List<ModuleDescription> module_description_list = new ArrayList<ModuleDescription>();
+		
+					Curriculum curriculum = (Curriculum) em.createQuery("SELECT x FROM Curriculum x WHERE x.completeName = '«mh.curriculum.completeName»'").getSingleResult();
+					ModuleSpecification curriculum_entry;
+					ModuleDescription module_desc;
+					
+					«FOR md: mh.moduleDescriptions»
+						curriculum_entry = (ModuleSpecification) em.createQuery("SELECT x FROM ModuleSpecification x WHERE x.completeName = '«md.curriculumEntry.name»'").getSingleResult();
+						
+						if (curriculum_entry != null) {
+							module_desc = new ModuleDescription();
+							
+							List<Professor> lecture_list = new ArrayList<Professor>();
+							Professor lecture;
+							
+							«FOR module_lecture: md.lectures»
+								lecture = (Professor) em.createQuery("SELECT x FROM Professor x WHERE x.completeName = '«module_lecture.name»'").getSingleResult();
+								if (lecture != null) { lecture_list.add(lecture); }
+							«ENDFOR»
+							
+							module_desc.setCurriculumEntry(curriculum_entry);
+							module_desc.setLanguage("«md.language»");
+							module_desc.setQualificationGoals("«md.qualificationGoals»");
+							module_desc.setContent("«md.content»");
+							module_desc.setLiterature("«md.literature»");
+							if (lecture_list != null && lecture_list.size() > 0) module_desc.setLectures(lecture_list);
+							//module_desc.setAdmissionRequirements(«md.admissionRequirements»);
+							//module_desc.setWorkloads(«md.workloads»);
+							//module_desc.setMedias(«md.medias»);
+							
+							module_description_list.add(module_desc);
+						}
+						
+					«ENDFOR»
+					module_handbook.setModuleDescriptions(module_description_list);
+					// em.persist(module_handbook);
+					
+					curriculum.getModuleHandbooks().add(module_handbook);
+					em.merge(curriculum);
+					
+		            em.getTransaction().commit();
+		            //em.close();
+		        } catch(Exception e) {
+		            e.printStackTrace();
+		            result = false;
+		        }
+		        
+		        return result;
+		    }
+		}
+	'''
 }

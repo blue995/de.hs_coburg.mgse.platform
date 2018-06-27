@@ -5,9 +5,16 @@ Semester Sommersemester 1
 
 Eintraege [
 	Eintrag [E1]
-	- Turnus j√§hrlich
+	- Turnus j‰hrlich
 	- Modul Prog1
 	- Leistungsnachweis Prog1.schrPr (90)
 	- Lehrveranstaltungsart Pr, SU
 	- Pruefer EIF.TB, EIF.JEB
+	
+	Eintrag [E2]
+	- Turnus j‰hrlich
+	- Modul GI
+	- Leistungsnachweis GI.schrPr (90)
+	- Lehrveranstaltungsart Pr, SU
+	- Pruefer EIF.HS
 ]

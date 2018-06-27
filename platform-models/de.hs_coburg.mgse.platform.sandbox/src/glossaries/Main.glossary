@@ -50,6 +50,10 @@ Sektion "Module"
 	[Prog1]
 	Wort: "Programmieren 1"
 	Abkuerzung: "Prog1"
+	
+	[GI]
+	Wort: "Grundlagen der Informatik"
+	Abkuerzung: "GI"
 Ende
 
 Sektion "Prüfungsarten"
