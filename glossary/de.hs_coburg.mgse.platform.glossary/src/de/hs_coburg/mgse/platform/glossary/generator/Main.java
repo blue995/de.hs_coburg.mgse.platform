@@ -8,15 +8,12 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import de.hs_coburg.mgse.platform.glossary.GlossaryModelStandaloneSetup;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -66,34 +63,37 @@ public class Main {
 			System.err.println("Error");
 			System.exit(1);
 		}
+		
 		Path outputPath = Paths.get(out);
-		glossaries.forEach(g -> {
-			runGenerator(g, outputPath);	
-		});
+		
+		// Load the resources
+		ResourceSet set = resourceSetProvider.get();
+		for(Path glossaryResourcePath : glossaries) {
+			URI uri = URI.createFileURI(glossaryResourcePath.toString());
+			set.getResource(uri, true);
+		}
+		
+		runGenerator(set, outputPath);
 		
 	}
 	
-	protected void runGenerator(Path input, Path outputPath) {
-		// Load the resource
-		ResourceSet set = resourceSetProvider.get();
-		URI uri = URI.createFileURI(input.toString());
-		Resource resource = set.getResource(uri, true);
-
-		// Validate the resource
-		List<Issue> list = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl);
-		if (!list.isEmpty()) {
-			for (Issue issue : list) {
-				System.err.println(issue);
+	protected void runGenerator(ResourceSet resourceSet, Path outputPath) {
+		for(Resource resource: resourceSet.getResources()) {
+			// Validate the resource
+			List<Issue> list = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl);
+			if (!list.isEmpty()) {
+				for (Issue issue : list) {
+					System.err.println(issue);
+				}
+				return;
 			}
-			return;
+
+			// Configure and start the generator
+			fileAccess.setOutputPath(outputPath.toString());
+			GeneratorContext context = new GeneratorContext();
+			context.setCancelIndicator(CancelIndicator.NullImpl);
+			generator.generate(resource, fileAccess, context);
 		}
-
-		// Configure and start the generator
-		fileAccess.setOutputPath(outputPath.toString());
-		GeneratorContext context = new GeneratorContext();
-		context.setCancelIndicator(CancelIndicator.NullImpl);
-		generator.generate(resource, fileAccess, context);
-
-		System.out.println("Code generation finished. (" + input +")");
+		System.out.println("Code generation finished. (" + resourceSet.getResources() +")");
 	}
 }
