@@ -3,6 +3,11 @@
  */
 package de.hs_coburg.mgse.platform.modulehandbook
 
+import com.google.inject.Injector
+import de.hs_coburg.mgse.platform.course.CourseModelStandaloneSetup
+import de.hs_coburg.mgse.platform.glossary.GlossaryModelStandaloneSetup
+import de.hs_coburg.mgse.platform.ser.SERModelStandaloneSetup
+import de.hs_coburg.mgse.platform.curriculum.CurriculumModelStandaloneSetup
 
 /**
  * Initialization support for running Xtext languages without Equinox extension registry.
@@ -11,5 +16,13 @@ class ModuleHandbookModelStandaloneSetup extends ModuleHandbookModelStandaloneSe
 
 	def static void doSetup() {
 		new ModuleHandbookModelStandaloneSetup().createInjectorAndDoEMFRegistration()
+	}
+	
+	override void register(Injector injector) {
+		super.register(injector)
+		new GlossaryModelStandaloneSetup().createInjectorAndDoEMFRegistration
+		new CourseModelStandaloneSetup().createInjectorAndDoEMFRegistration
+		new SERModelStandaloneSetup().createInjectorAndDoEMFRegistration
+		new CurriculumModelStandaloneSetup().createInjectorAndDoEMFRegistration
 	}
 }
