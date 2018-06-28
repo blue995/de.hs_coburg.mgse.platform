@@ -207,7 +207,7 @@ class SERModelValidator extends AbstractSERModelValidator {
 			for (var int j = 0; j < paragraphs.size(); j++) {
 				if (i != j)
 					if (pNumber == paragraphs.get(j).getNumber())
-						error('The §' + pNumber + ' already exists', ser, SERModelPackage.Literals.PARAGRAPH__NUMBER);
+						error('The Â§' + pNumber + ' already exists', ser, SERModelPackage.Literals.PARAGRAPH__NUMBER);
 			}
 		}
 	}
@@ -225,7 +225,7 @@ class SERModelValidator extends AbstractSERModelValidator {
 			for (var int j = 0; j < subParagraphs.size(); j++) {
 				if (i != j)
 					if (pNumber == subParagraphs.get(j).getNumber())
-						error('The subparagraph §§' + pNumber + ' already exists', paragraph, SERModelPackage.Literals.SUB_PARAGRAPH__NUMBER);
+						error('The subparagraph Â§Â§' + pNumber + ' already exists', paragraph, SERModelPackage.Literals.SUB_PARAGRAPH__NUMBER);
 			}
 		}
 	}
