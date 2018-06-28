@@ -107,7 +107,11 @@ RichText:
 ;
 
 RichTextLiteral:
-	text=STRING | RichTextReference
+	RichTextString | RichTextReference
+;
+
+RichTextString:
+	text=STRING
 ;
 
 RichTextReference:
