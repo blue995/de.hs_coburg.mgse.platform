@@ -32,14 +32,11 @@ class SERModelValidator extends AbstractSERModelValidator {
 //	}
 
 
-	// TODO	
 	// "The quanitifer of a module must be greater than 0."
-	//Context: AModule
-	//	inv: self.quantifier > 0
 	@Check
 	def checkQuantifier(Module module) {
 		val quantifier = module.getQuantifier()
-		if (quantifier === null)
+		if (Double.parseDouble(quantifier) <= 0)
 			error('The quanitifer of a module must be greater than 0', module, SERModelPackage.Literals.MODULE__QUANTIFIER)
 	}
 
@@ -65,19 +62,22 @@ class SERModelValidator extends AbstractSERModelValidator {
 	def checkCountModule(Module module) {
 		if (module.isAbstract())
 			if (module.count <= 0)
-				error('An abstract module must have a positive count attribute', module, SERModelPackage.Literals.MODULE__COUNT)
+				error('The count of an abstract module should be greater than 0', module, SERModelPackage.Literals.MODULE__COUNT)
 	}
 	
 	// "The total ECTS of an abstract module are the defined ects * the count attribute."
 	@Check
 	def checkTotalECTS(Module module) {
+		val totalEcts = module.calculateEcts
+		val ectsCount = module.ects * module.count
+		
 		if (module.abstract)
-			if (module.calculateEcts != module.ects * module.count) {
-				error('The total ECTS do not match the ECTS * count attribute', module, SERModelPackage.Literals.MODULE__ECTS)
+			if (totalEcts != ectsCount) {
+				error('The total ECTS ' + totalEcts + ' do not match ' + ectsCount, module, SERModelPackage.Literals.MODULE__ECTS)
 		}
 		else {
-			if (module.calculateEcts != module.ects) {
-				error('Module ECTS do not match', module, SERModelPackage.Literals.MODULE__ECTS)
+			if (totalEcts != module.ects) {
+				error('Module ECTS ' + module.ects + ' do not match the total ECTS ' + totalEcts, module, SERModelPackage.Literals.MODULE__ECTS)
 			}
 		}	
 	}
@@ -106,7 +106,7 @@ class SERModelValidator extends AbstractSERModelValidator {
 			moduleEctsSum += modules.get(i).getEcts()
 		}
 		//if (studySectionSumEcts != moduleEctsSum) {
-			//error('Wrong Sum of ECTS', studySection, SERModelPackage.Literals.MODULE__ECTS);
+			//error(studySectionSumEcts + ' does not match ' + moduleEctsSum, studySection, SERModelPackage.Literals.MODULE__ECTS);
 		//}
 	}
 	
@@ -122,7 +122,7 @@ class SERModelValidator extends AbstractSERModelValidator {
 			moduleHourSum += modules.get(i).getSemesterHours()
 		}
 		//if (studySectionSumHours != moduleHourSum) {
-			//error('Wrong Sum of Semester Hours', studySection, SERModelPackage.Literals.MODULE__SEMESTER_HOURS);
+			//error(studySectionSumHours + ' does not match ' + moduleHourSum, studySection, SERModelPackage.Literals.MODULE__SEMESTER_HOURS);
 		//}
 	}
 	
@@ -132,7 +132,7 @@ class SERModelValidator extends AbstractSERModelValidator {
 		val firstSemester = studySection.getFirstSemester()
 		val lastSemester = studySection.getLastSemester()
 		if (firstSemester > lastSemester)
-			error('First semester is greater than last semester', studySection, SERModelPackage.Literals.STUDY_SECTION__FIRST_SEMESTER);
+			error('First semester=' + firstSemester + ' is greater than last semester=' + lastSemester, studySection, SERModelPackage.Literals.STUDY_SECTION__FIRST_SEMESTER);
 	}
 	
 	// "The version of a SER should be greater than 0."
@@ -140,7 +140,7 @@ class SERModelValidator extends AbstractSERModelValidator {
 	def checkVersionOfStudyExamination(StudyExaminationRegulations ser) {
 		val version = ser.getVersion()
 		if (version <= 0)
-			error('Negative Version', ser, SERModelPackage.Literals.STUDY_EXAMINATION_REGULATIONS__VERSION)
+			error('The version of a study examination regulation should be greater than 0', ser, SERModelPackage.Literals.STUDY_EXAMINATION_REGULATIONS__VERSION)
 	}
 	
 	// "The first and last semester of a study section must be lower or equal to the maximum semesters defined in the course of studies"
@@ -152,9 +152,9 @@ class SERModelValidator extends AbstractSERModelValidator {
 
 		for (var int i = 0; i < studySections.size(); i++) {
 			if (studySections.get(i).firstSemester > maxSemesters)
-				error('The first semester does not match the maximum semester', ser, SERModelPackage.Literals.STUDY_SECTION__FIRST_SEMESTER);				
+				error('The first semester does not match the maximum semester=' + maxSemesters, ser, SERModelPackage.Literals.STUDY_SECTION__FIRST_SEMESTER);				
 			if (studySections.get(i).lastSemester > maxSemesters)
-				error('The last semester does not match the maximum semester', ser, SERModelPackage.Literals.STUDY_SECTION__LAST_SEMESTER);
+				error('The last semester does not match the maximum semester=' + maxSemesters, ser, SERModelPackage.Literals.STUDY_SECTION__LAST_SEMESTER);
 		}
 	}
 	
@@ -207,7 +207,7 @@ class SERModelValidator extends AbstractSERModelValidator {
 			for (var int j = 0; j < paragraphs.size(); j++) {
 				if (i != j)
 					if (pNumber == paragraphs.get(j).getNumber())
-						error('The number of the paragraph already exists', ser, SERModelPackage.Literals.PARAGRAPH__NUMBER);
+						error('The §' + pNumber + ' already exists', ser, SERModelPackage.Literals.PARAGRAPH__NUMBER);
 			}
 		}
 	}
@@ -225,7 +225,7 @@ class SERModelValidator extends AbstractSERModelValidator {
 			for (var int j = 0; j < subParagraphs.size(); j++) {
 				if (i != j)
 					if (pNumber == subParagraphs.get(j).getNumber())
-						error('The number of the subparagraph already exists', paragraph, SERModelPackage.Literals.SUB_PARAGRAPH__NUMBER);
+						error('The subparagraph §§' + pNumber + ' already exists', paragraph, SERModelPackage.Literals.SUB_PARAGRAPH__NUMBER);
 			}
 		}
 	}
@@ -241,7 +241,7 @@ class SERModelValidator extends AbstractSERModelValidator {
 				val pNumber = paragraphs.get(i).getNumber()
 				val pNumberNext = paragraphs.get(i+1).getNumber()
 			
-				if (pNumber +1 != pNumberNext)
+				if (pNumber +1 != pNumberNext || paragraphs.get(0) != 1)
 					error('The numbers of the paragraphs are not in order', ser, SERModelPackage.Literals.PARAGRAPH__NUMBER);
 			}
 		}
@@ -254,6 +254,6 @@ class SERModelValidator extends AbstractSERModelValidator {
 		val upperBound = examType.upperBound
 		
 		if (lowerBound > upperBound)
-			error('The lower bound of an exam should be lower or equal to the upper bound', examType, SERModelPackage.Literals.EXAM_TYPE__LOWER_BOUND);
+			error('The lower bound ' + lowerBound + ' of an exam should be lower or equal to ' + upperBound, examType, SERModelPackage.Literals.EXAM_TYPE__LOWER_BOUND);
 	}
 }

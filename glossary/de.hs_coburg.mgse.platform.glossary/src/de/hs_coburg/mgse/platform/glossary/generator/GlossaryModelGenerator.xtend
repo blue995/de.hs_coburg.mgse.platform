@@ -4,8 +4,6 @@
 package de.hs_coburg.mgse.platform.glossary.generator
 
 import de.hs_coburg.mgse.platform.glossary.glossaryModel.Glossary
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossarySection
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
@@ -37,7 +35,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 			toVisit.addAll(allGlossariesToGenerate)
 			fsa.generateFile("GlossaryModelCreator.java", compileGlossaries(toVisit))
 		} 
-		
+		/* 
 		for(e: resource.allContents.toIterable.filter(Glossary)) {
 			fsa.generateFile(
 				e.name.toLowerCase() + ".html",
@@ -59,11 +57,11 @@ class GlossaryModelGenerator extends AbstractGenerator {
             	"GlossaryEntry.java",
             	e.compileEntityBean
             )
-		}
+		}*/
 	}
 	
 	def compileGlossaries(Collection<Glossary> glossaries)'''
-		package de.hs_coburg.mgse.modelcreator;
+		package de.hs_coburg.mgse.persistence.creators;
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
 		import javax.persistence.EntityManager;		
@@ -133,7 +131,7 @@ class GlossaryModelGenerator extends AbstractGenerator {
 			«ENDFOR»
 		}
 	'''
-	
+	/* 
 	def compileHTML(Glossary glossary)'''
 		<!DOCTYPE html>
 		<html>
@@ -294,5 +292,5 @@ class GlossaryModelGenerator extends AbstractGenerator {
 			«ENDIF»
 			«ENDFOR»
 		}
-	'''
+	'''*/
 }

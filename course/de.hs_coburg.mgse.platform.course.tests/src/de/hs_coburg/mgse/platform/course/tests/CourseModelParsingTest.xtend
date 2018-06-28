@@ -8,9 +8,9 @@ import de.hs_coburg.mgse.platform.course.courseModel.Model
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.testing.util.ParseHelper
-import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
+import static org.junit.Assert.*
 
 @RunWith(XtextRunner)
 @InjectWith(CourseModelInjectorProvider)
@@ -19,7 +19,7 @@ class CourseModelParsingTest {
 	ParseHelper<Model> parseHelper
 	
 	@Test
-	def void loadFaculty() {
+	def void facultyIsGenerated() {
 		val result = parseHelper.parse('''
 			Fakultaet "Elektrotechnik und Informatik" [EIF]
 			
@@ -62,12 +62,638 @@ class CourseModelParsingTest {
 				- Kuerzel Begriffe.HS
 			]
 		''')
-		Assert.assertNotNull(result)
-		Assert.assertTrue(result.eResource.errors.isEmpty)
+		assertNotNull(result)
+		assertTrue(result.eResource.errors.isEmpty)
 	}
 	
 	@Test
-	def void loadDegreeList() {
+	def void facultyHasNoErrorsWithSingleCourseOfStudy() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			]
+			
+			Professoren [
+				Professor [TB]
+				- Vorname "Tobias"
+				- Nachname "BlaufuÃŸ"
+				- Email "tobias.blaufuss@stud.hs-coburg.de"
+				- Raum "Oben"
+				- Kuerzel Begriffe.TB
+				
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+				
+				Professor [HS]
+				- Vorname "Hakan"
+				- Nachname "Senkaya"
+				- Email "hakan.senkaya@stud.hs-coburg.de"
+				- Raum "Noch weiter oben"
+				- Kuerzel Begriffe.HS
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyHasNoErrorsWithMultipleCoursesOfStudy() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [TB]
+				- Vorname "Tobias"
+				- Nachname "BlaufuÃŸ"
+				- Email "tobias.blaufuss@stud.hs-coburg.de"
+				- Raum "Oben"
+				- Kuerzel Begriffe.TB
+				
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+				
+				Professor [HS]
+				- Vorname "Hakan"
+				- Nachname "Senkaya"
+				- Email "hakan.senkaya@stud.hs-coburg.de"
+				- Raum "Noch weiter oben"
+				- Kuerzel Begriffe.HS
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyCourseOfStudyEntryIsOptional() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+			]
+			
+			Professoren [
+				Professor [TB]
+				- Vorname "Tobias"
+				- Nachname "BlaufuÃŸ"
+				- Email "tobias.blaufuss@stud.hs-coburg.de"
+				- Raum "Oben"
+				- Kuerzel Begriffe.TB
+				
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+				
+				Professor [HS]
+				- Vorname "Hakan"
+				- Nachname "Senkaya"
+				- Email "hakan.senkaya@stud.hs-coburg.de"
+				- Raum "Noch weiter oben"
+				- Kuerzel Begriffe.HS
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyHasNoErrorsWithSingleProfessor() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [TB]
+				- Vorname "Tobias"
+				- Nachname "BlaufuÃŸ"
+				- Email "tobias.blaufuss@stud.hs-coburg.de"
+				- Raum "Oben"
+				- Kuerzel Begriffe.TB
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyNameIsRequired() {
+		val result = parseHelper.parse('''			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertNull(result)
+	}
+	
+	@Test
+	def void facultyHasNoErrorsWithMultipleProfessors() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [TB]
+				- Vorname "Tobias"
+				- Nachname "BlaufuÃŸ"
+				- Email "tobias.blaufuss@stud.hs-coburg.de"
+				- Raum "Oben"
+				- Kuerzel Begriffe.TB
+				
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyCourseOfStudyIdIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyCourseOfStudyAdmissionRequirementsIsOptional() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyCourseOfStudyEctsIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				Semester 7
+				Abschluss BSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyCourseOfStudySemestersIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Abschluss BSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyCourseOfStudyDegreeIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyCourseOfStudyAdmissionRequirementIdIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyNeedsAtLeastOneProfessor() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyProfessorIdIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyProfessorFirstNameIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyProfessorMiddleNameIsOptional() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyProfessorLastNameIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyProfessorEmailIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Raum "links"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyProfessorRoomIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Kuerzel Begriffe.JEB
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void facultyProfessorAbbreviationIsRequired() {
+		val result = parseHelper.parse('''
+			Fakultaet "Elektrotechnik und Informatik" [EIF]
+			
+			Studiengaenge [
+				Studiengang "Informatik" [IF_B]
+				Zulassungsvoraussetzung AHR, FHR
+				ECTS 210
+				Semester 7
+				Abschluss BSc
+			
+				
+				Studiengang "Informatik" [IF_M]
+				Zulassungsvoraussetzung BSc
+				ECTS 90
+				Semester 3
+				Abschluss MSc
+			]
+			
+			Professoren [
+				Professor [JEB]
+				- Vorname "Jonathan"
+				- Zweitname "Emmanuel"
+				- Nachname "Braat"
+				- Email "jonathan-emmanuel.braat@stud.hs-coburg.de"
+				- Raum "links"
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListIsGenerated() {
 		val result = parseHelper.parse('''
 			Abschlussarten [
 				- [Bachelor]: "Bachelor"
@@ -81,12 +707,288 @@ class CourseModelParsingTest {
 				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
 			]
 		''')
-		Assert.assertNotNull(result)
-		Assert.assertTrue(result.eResource.errors.isEmpty)
+		assertNotNull(result)
 	}
 	
 	@Test
-	def void loadAdmissionRequirementList() {
+	def void degreeListHasNoErrorsWithSingleDegreeClass() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListHasNoErrorsWithMultipleDegreeClasses() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListDegreeClassesEntriesAreOptional() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListHasNoErrorsWithSingleSubDegree() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListHasNoErrorsWithMultipleSubDegreees() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+				- [Chocolate]: "Chocolate"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListSubDegreeesEntriesAreOptional() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListHasNoErrorsWithSingleDegree() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListHasNoErrorsWithMultipleDegrees() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListDegreesEntriesAreOptional() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListDegreeClassIdIsRequired() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- "Bachelor"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListDegreeClassNameIsRequired() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListSubDegreeIdIsRequired() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListSubDegreeNameIsRequired() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+				- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListDegreeIdIsRequired() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListDegreeNameIsRequired() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void degreeListDegreeDetailsIsOptional() {
+		val result = parseHelper.parse('''
+			Abschlussarten [
+				- [Bachelor]: "Bachelor"
+				- [Master]: "Master"
+			]
+			Abschlussunterarten [
+				- [Science]: "Science"
+			]
+			Abschluesse [
+				- [BSc]: Bachelor of Science
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void admissionRequirementListIsGenerated() {
 		val result = parseHelper.parse('''
 			Zulassungsvoraussetzungen [
 			- [AHR]: "Allgemeine Hochschulreife"
@@ -94,7 +996,56 @@ class CourseModelParsingTest {
 			- [BSc]: "Bachelor of Science"
 			]
 		''')
-		Assert.assertNotNull(result)
-		Assert.assertTrue(result.eResource.errors.isEmpty)
+		assertNotNull(result)
+	}
+	
+	@Test
+	def void admissionRequirementHasNoErrorWithSingleEntry() {
+		val result = parseHelper.parse('''
+			Zulassungsvoraussetzungen [
+			- [AHR]: "Allgemeine Hochschulreife"
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void admissionRequirementHasNoErrorWithMultipleEntries() {
+		val result = parseHelper.parse('''
+			Zulassungsvoraussetzungen [
+			- [AHR]: "Allgemeine Hochschulreife"
+			- [FHR]: "Fachhochschulreife"
+			]
+		''')
+		assertTrue(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void admissionRequirementNeedsAtLeastOneEntry() {
+		val result = parseHelper.parse('''
+			Zulassungsvoraussetzungen [
+			]
+		''')
+		assertNull(result)
+	}
+	
+	@Test
+	def void admissionRequirementIdIsRequired() {
+		val result = parseHelper.parse('''
+			Zulassungsvoraussetzungen [
+			- "Allgemeine Hochschulreife"
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
+	}
+	
+	@Test
+	def void admissionRequirementValueIsRequired() {
+		val result = parseHelper.parse('''
+			Zulassungsvoraussetzungen [
+			 - "Allgemeine Hochschulreife"
+			]
+		''')
+		assertFalse(result.eResource.errors.isEmpty)
 	}
 }

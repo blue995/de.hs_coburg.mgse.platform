@@ -40,7 +40,7 @@ class ModuleHandbookModelGenerator extends AbstractGenerator {
 	}
 	
 	def compile(ModuleHandbook mh) ''' 
-		package de.hs_coburg.mgse.modelcreator;
+		package de.hs_coburg.mgse.persistence.creators;
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
 		import javax.persistence.EntityManager;		

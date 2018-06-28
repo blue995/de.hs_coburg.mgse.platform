@@ -30,6 +30,13 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 //		}
 //	}
 
+	// "The version of a module handbook should be greater than 0."
+	@Check
+	def checkVersionOfCurriculum(ModuleHandbook mhb) {
+		val version = mhb.getVersion()
+		if (version <= 0)
+			error('The version of a module handbook should be greater than 0', mhb, ModuleHandbookModelPackage.Literals.MODULE_HANDBOOK__VERSION)
+	}
 
 	// "The effort for a workload must be greater than 0."
 	@Check
@@ -52,34 +59,16 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 		}
 	}
 	
-	// TODO
 	// "Only modules which are specified in the referenced curriculum entry can be described in the module handbook."
-	//Context: ModuleHandbook
-	//	let possibleEntries = self.curriculum.curriculumEntries
-	//	let actualReferencedEntries = self.moduleDescriptions.curriculumEntry
-	//	inv: possibleEntries -> includeAll(actualReferencedEntries)
 	@Check
 	def checkSpecifiedModule(ModuleHandbook mhb) {
-		// TODO-ks : Not done yet
+
 		val possibleEntries = mhb.curriculum.curriculumEntries
 		val actualReferencedEntries = mhb.moduleDescriptions.map[md | md.curriculumEntry]
-		
+
 		for (var int i = 0; i < possibleEntries.size(); i++) {
-			
-		}
-		
-		
-		
-		/* 
-		for (var int i = 0; i < actualReferencedEntries.size(); i++) {
 			if (!possibleEntries.contains(actualReferencedEntries.get(i)))
-				error('Only modules which are specified in the referenced curriculum entry can be described in the module handbook', mhb, ModuleHandbookModelPackage.Literals.CURRICULUM__YEAR)
+				error('Only modules which are specified in the referenced curriculum entry can be described in the module handbook', mhb, ModuleHandbookModelPackage.Literals.MODULE_HANDBOOK__MODULE_DESCRIPTIONS)
 		}
-		*/
-		
-		
-		
-		
-		
 	}
 }

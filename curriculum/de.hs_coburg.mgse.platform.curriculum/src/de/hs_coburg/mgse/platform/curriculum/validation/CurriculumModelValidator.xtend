@@ -37,7 +37,7 @@ class CurriculumModelValidator extends AbstractCurriculumModelValidator {
 	def checkVersionOfCurriculum(Curriculum cur) {
 		val version = cur.getVersion()
 		if (version <= 0)
-			error('Negative Version', cur, CurriculumModelPackage.Literals.CURRICULUM__VERSION)
+			error('The version of a curriculum should be greater than 0', cur, CurriculumModelPackage.Literals.CURRICULUM__VERSION)
 	}
 
 	// "The year of a curriculum should be greater than 0."
@@ -45,7 +45,7 @@ class CurriculumModelValidator extends AbstractCurriculumModelValidator {
 	def checkYearOfCurriculum(Curriculum cur) {
 		val year = cur.getYear()
 		if (year <= 0)
-			error('Year cannot be lower than 0', cur, CurriculumModelPackage.Literals.CURRICULUM__YEAR)
+			error('The year of a curriculum should be greater than 0', cur, CurriculumModelPackage.Literals.CURRICULUM__YEAR)
 	}
 	
 	// "All specified modules of the curriculum have to be specified by the referenced SER."
@@ -61,7 +61,7 @@ class CurriculumModelValidator extends AbstractCurriculumModelValidator {
 				val specifiedModuleSpecification = curEntries.get(j).moduleSpecification.module
 					
 				if (!possibleModules.contains(specifiedModuleSpecification)) {
-					error('All specified modules of the curriculum have to be specified by the referenced SER', cur, CurriculumModelPackage.Literals.CURRICULUM__CURRICULUM_ENTRIES)
+					error('All specified modules of the curriculum have to be specified by the referenced study examination regulation', cur, CurriculumModelPackage.Literals.CURRICULUM__CURRICULUM_ENTRIES)
 				}
 			}
 		}
@@ -112,7 +112,7 @@ class CurriculumModelValidator extends AbstractCurriculumModelValidator {
 		
 		for (var int i = 0; i < actualCourseTypes.size(); i++) {
 			if (!possibleCourseTypes.contains(actualCourseTypes.get(i)))
-				error('The referenced module does not contain course type', cEntry, CurriculumModelPackage.Literals.CURRICULUM__YEAR)
+				error('The course type of a curriculum entry must be defined in the referenced module', cEntry, CurriculumModelPackage.Literals.CURRICULUM__YEAR)
 		}
 	}	
 }
