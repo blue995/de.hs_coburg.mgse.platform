@@ -3,6 +3,9 @@
  */
 package de.hs_coburg.mgse.platform.course
 
+import com.google.inject.Injector
+import de.hs_coburg.mgse.platform.glossary.GlossaryModelStandaloneSetup
+
 /**
  * Initialization support for running Xtext languages without Equinox extension registry.
  */
@@ -10,5 +13,10 @@ class CourseModelStandaloneSetup extends CourseModelStandaloneSetupGenerated {
 
 	def static void doSetup() {
 		new CourseModelStandaloneSetup().createInjectorAndDoEMFRegistration()
+	}
+	
+	override void register(Injector injector) {
+		super.register(injector)
+		new GlossaryModelStandaloneSetup().createInjectorAndDoEMFRegistration
 	}
 }

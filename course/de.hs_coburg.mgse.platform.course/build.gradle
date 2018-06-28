@@ -27,7 +27,22 @@ task generateXtextLanguage(type: JavaExec) {
 	args += "rootPath=/${projectDir}/.."
 }
 
+task buildStandalone(type: Jar) {
+	destinationDir = file("$rootDir/$standaloneBuildPath")
+	manifest {
+        attributes 'Implementation-Title': 'Course Standalone Application',  
+        	'Implementation-Version': version,
+        	'Main-Class': 'de.hs_coburg.mgse.platform.course.generator.Main'
+    }
+	baseName = project.name + '-standalone'
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } } {
+		 exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+	}
+	with jar
+}
+
 generateXtext.dependsOn(generateXtextLanguage)
+buildStandalone.dependsOn(generateXtext)
 clean.dependsOn(cleanGenerateXtextLanguage)
 eclipse.classpath.plusConfigurations += [configurations.mwe2]
 //this is an eclipse plugin project
