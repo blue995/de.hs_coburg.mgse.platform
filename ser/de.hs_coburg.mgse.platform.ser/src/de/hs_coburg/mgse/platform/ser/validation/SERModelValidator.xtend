@@ -152,9 +152,9 @@ class SERModelValidator extends AbstractSERModelValidator {
 
 		for (var int i = 0; i < studySections.size(); i++) {
 			if (studySections.get(i).firstSemester > maxSemesters)
-				error('The first semester does not match the maximum semester=' + maxSemesters, ser, SERModelPackage.Literals.STUDY_SECTION__FIRST_SEMESTER);				
+				error('The first semester does not match the maximum semester=' + maxSemesters, studySections.get(i), SERModelPackage.Literals.STUDY_SECTION__FIRST_SEMESTER);				
 			if (studySections.get(i).lastSemester > maxSemesters)
-				error('The last semester does not match the maximum semester=' + maxSemesters, ser, SERModelPackage.Literals.STUDY_SECTION__LAST_SEMESTER);
+				error('The last semester does not match the maximum semester=' + maxSemesters, studySections.get(i), SERModelPackage.Literals.STUDY_SECTION__LAST_SEMESTER);
 		}
 	}
 	
@@ -234,17 +234,37 @@ class SERModelValidator extends AbstractSERModelValidator {
 	@Check
 	def checkParagraphNumberOrder(StudyExaminationRegulations ser) {
 		val paragraphs = ser.paragraphs
+		if(paragraphs.empty) return
+		val iterator = paragraphs.iterator
 		
-		for (var int i = 0; i < paragraphs.size(); i++) {
-			
-			if (i < paragraphs.size() - 1) {
-				val pNumber = paragraphs.get(i).getNumber()
-				val pNumberNext = paragraphs.get(i+1).getNumber()
-			
-				if (pNumber +1 != pNumberNext || paragraphs.get(0) != 1)
-					error('The numbers of the paragraphs are not in order', ser, SERModelPackage.Literals.PARAGRAPH__NUMBER);
+		var previousNumbering = 0
+		
+		do {
+			val currentParagraph = iterator.next
+			val currentNumbering = currentParagraph.number
+			if(currentNumbering != previousNumbering + 1){
+				error('''Expected «previousNumbering + 1» as paragraph numbering''', currentParagraph, SERModelPackage.Literals.PARAGRAPH__NUMBER);
 			}
-		}
+			previousNumbering = currentNumbering
+		} while(iterator.hasNext)
+	}
+	
+	@Check
+	def checkSubParagraphNumberOrder(Paragraph paragraph) {
+		val paragraphs = paragraph.subParagraphs
+		if(paragraphs.empty) return
+		val iterator = paragraphs.iterator
+		
+		var previousNumbering = 0
+		
+		do {
+			val currentParagraph = iterator.next
+			val currentNumbering = currentParagraph.number
+			if(currentNumbering != previousNumbering + 1){
+				error('''Expected «previousNumbering + 1» as paragraph numbering''', currentParagraph, SERModelPackage.Literals.SUB_PARAGRAPH__NUMBER);
+			}
+			previousNumbering = currentNumbering
+		} while(iterator.hasNext)
 	}
 		
 	// "The lower bound of an exam type should be lower or equal to the upper bound."
