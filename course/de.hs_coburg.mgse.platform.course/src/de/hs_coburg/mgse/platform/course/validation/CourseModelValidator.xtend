@@ -29,8 +29,8 @@ class CourseModelValidator extends AbstractCourseModelValidator {
 	@Check
 	def checkECTS(CourseOfStudies cos) {
 		val ects = cos.getEcts();
-		if(ects <= 0) {
-			error('Negative ECTS Value', cos, CourseModelPackage.Literals.COURSE_OF_STUDIES__ECTS);
+		if(ects <= 1) {
+			error('The ECTS of a course of studies must be greater than 1', cos, CourseModelPackage.Literals.COURSE_OF_STUDIES__ECTS);
 		}
 	}
 	
@@ -38,8 +38,8 @@ class CourseModelValidator extends AbstractCourseModelValidator {
 	@Check
 	def checkSemester(CourseOfStudies cos) {
 		val sem = cos.getSemester();
-		if(sem <= 0) {
-			error('Negative Semester Value', cos, CourseModelPackage.Literals.COURSE_OF_STUDIES__SEMESTER);
+		if(sem <= 1) {
+			error('The total semester of a course of studies must be greater than 1', cos, CourseModelPackage.Literals.COURSE_OF_STUDIES__SEMESTER);
 		}
 	}
 }
