@@ -24,6 +24,7 @@ Paragraphen [
 			Fachhochschulen (RaPO) vom 17. Oktober 2001 (BayRS 2210–1–1–WFK) und der
 			Allgemeinen Prüfungsordnung der Hochschule für angewandte Wissenschaften Coburg
 			(APO) vom 14. November 2013 (Amtsblatt 2013) in der jeweiligen Fassung"
+		[Fussnoten:F1, F2, F3]
 	Ende
 	
 	Start
@@ -44,9 +45,9 @@ Paragraphen [
 		§ 3
 		Titel "Regelstudienzeit, Aufbau des Studiums, Vertiefungsrichtungen"
 		§§ 1
-		- "Die Regelstudienzeit beträgt sieben Studiensemester."
+		- "Die Regelstudienzeit beträgt sieben Studiensemester." [Fussnoten:F1]
 		§§ 2
-		- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung."
+		- "Der Aufbau des Studiums ergibt sich aus der Anlage zu dieser Studien- und Prüfungsordnung." [Fussnoten:F2, F3]
 		§§ 3
 		- "Eine Vertiefungsrichtung ist eine Gruppe von fachlich zusammengehörenden Modulen,
 			in denen ein bestimmtes Fachgebiet vertieft wird."
@@ -117,6 +118,4 @@ Studienabschnitte [
 			Pr, SU, UE, V
 		]   
 	]
-	
-	
 ]

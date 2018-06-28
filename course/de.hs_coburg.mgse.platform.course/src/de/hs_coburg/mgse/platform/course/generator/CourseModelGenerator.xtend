@@ -3,12 +3,9 @@
  */
 package de.hs_coburg.mgse.platform.course.generator
 
-import de.hs_coburg.mgse.platform.course.courseModel.CourseOfStudies
 import de.hs_coburg.mgse.platform.course.courseModel.Faculty
-import de.hs_coburg.mgse.platform.course.courseModel.Degree
 import de.hs_coburg.mgse.platform.course.courseModel.DegreeList
 import de.hs_coburg.mgse.platform.course.courseModel.AdmissionRequirementList
-import de.hs_coburg.mgse.platform.glossary.glossaryModel.GlossaryEntry
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
@@ -23,19 +20,19 @@ import java.util.LinkedList
  */
 class CourseModelGenerator extends AbstractGenerator {
 
-	//counter for compileModelCreatorDegree
+	//counter for compileDegrees
 	private int dl_counter = 0;
 	private int d_counter = 0;
 	private int dc_counter = 0;
 	private int sd_counter = 0;
 	private Collection<DegreeList> toVisitDegree
 
-	//counter for compileModelAdmissionRequirement
+	//counter for compileAdmissionRequirements
 	private int ar_counter = 0;
 	private int art_counter = 0;
 	private Collection<AdmissionRequirementList> toVisitAdmissionRequirement
 	
-	//counter for compileModelCreatorFaculty
+	//counter for compileCourse
 	private int c_counter = 0;
 	private int cos_counter = 0;
 	private int p_counter = 0;
@@ -73,17 +70,17 @@ class CourseModelGenerator extends AbstractGenerator {
 			toVisitFaculty.addAll(allFacultiesToGenerate)
 			fsa.generateFile("CourseModelCreator.java", compileCourse(toVisitFaculty))
 		} 
-		
+		/* 
 		for(e: resource.allContents.toIterable.filter(Faculty)) {
 			fsa.generateFile(
 				e.name + ".html",
 				e.compileHTML
 			)
-		}
+		}*/
 	}
 	
 	def compileDegrees(Collection<DegreeList> degrees) '''
-		package de.hs_coburg.mgse.modelcreator;
+		package de.hs_coburg.mgse.persistence.creators;
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
 		import javax.persistence.EntityManager;		
@@ -147,7 +144,7 @@ class CourseModelGenerator extends AbstractGenerator {
 	'''
 	
 	def compileAdmissionRequirements(Collection<AdmissionRequirementList> requirements) '''
-		package de.hs_coburg.mgse.modelcreator;
+		package de.hs_coburg.mgse.persistence.creators;
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
 		import javax.persistence.EntityManager;		
@@ -193,7 +190,7 @@ class CourseModelGenerator extends AbstractGenerator {
 	'''
 	
 	def compileCourse(Collection<Faculty> faculties) '''
-		package de.hs_coburg.mgse.modelcreator;
+		package de.hs_coburg.mgse.persistence.creators;
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
 		import javax.persistence.EntityManager;		
@@ -281,7 +278,7 @@ class CourseModelGenerator extends AbstractGenerator {
 			}
 		}
 	'''
-	
+	/* 
 	def compileHTML(Faculty faculty)'''
 		<!DOCTYPE html>
 		<html>
@@ -315,5 +312,5 @@ class CourseModelGenerator extends AbstractGenerator {
 	'''
 	def compileHTML(GlossaryEntry entry)'''
 		<div>Abschluss: «entry.information.word»</div>
-	'''
+	'''*/
 }
