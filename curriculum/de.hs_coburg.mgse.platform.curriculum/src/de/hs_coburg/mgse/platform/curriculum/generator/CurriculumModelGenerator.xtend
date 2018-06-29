@@ -116,8 +116,11 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
 		import javax.persistence.EntityManager;
-		import java.util.ArrayList;
-		import java.util.List;
+		import javax.persistence.TypedQuery;
+		import javax.persistence.criteria.CriteriaBuilder;
+		import javax.persistence.criteria.CriteriaQuery;
+		import javax.persistence.criteria.Root;
+		import java.util.*;
 		import java.util.stream.Collectors;
 		
 		import de.hs_coburg.mgse.persistence.model.Aid;
@@ -211,11 +214,15 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    			ms«ms_counter».setCustomAids(l_caid«ms_counter»);
 		    			
 		    			//Professor (Tester)
-		    			List<Professor> l_p«ms_counter» = new ArrayList<Professor>();
-		    			«FOR p: ms.testers»
-		    			Professor p«prof_counter» = (Professor) em.createQuery("SELECT p FROM Professor p WHERE p.abbreviation = '«p.abbreviation.information.abbreviation»'").getSingleResult();
-		    			if(p«prof_counter» != null) l_p«ms_counter».add(p«prof_counter++»);
-		    			«ENDFOR»
+		    			List<Professor> l_p«ms_counter» = new LinkedList<Professor>();
+		    			«IF !ms.testers.empty»
+		    			l_p«ms_counter».addAll(getAllEntries(Professor.class, em));
+		    			l_p«ms_counter» = l_p«ms_counter».stream().
+		    				«FOR p: ms.testers»
+		    				filter(_p -> _p.getAbbreviation().getAbbreviation().equals("«p.abbreviation.information.abbreviation»")).
+		    				«ENDFOR»
+		    				collect(Collectors.toList());	
+		    			«ENDIF»	    			
 		    			ms«ms_counter».setTesters(l_p«ms_counter»);
 		    			
 		    			l_ms«cur_counter».add(ms«ms_counter++»);
@@ -234,6 +241,19 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    	}
 		    }
 		    «ENDFOR»
+		    
+		    «compileGetAll»
 		}
+	'''
+	
+	def compileGetAll()'''
+	public static <E> List<E> getAllEntries(Class<E> clazz, EntityManager em){
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<E> cq = cb.createQuery(clazz);
+		Root<E> rootEntry = cq.from(clazz);
+		CriteriaQuery<E> all = cq.select(rootEntry);
+		TypedQuery<E> allQuery = em.createQuery(all);
+		return allQuery.getResultList();
+	}
 	'''
 }
