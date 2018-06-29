@@ -3,10 +3,15 @@
  */
 package de.hs_coburg.mgse.platform.curriculum.generator
 
+import de.hs_coburg.mgse.platform.curriculum.curriculumModel.AidList
+import de.hs_coburg.mgse.platform.curriculum.curriculumModel.Curriculum
+
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import java.util.Collection
+import java.util.LinkedList
 
 /**
  * Generates code from your model files on save.
@@ -15,11 +20,160 @@ import org.eclipse.xtext.generator.IGeneratorContext
  */
 class CurriculumModelGenerator extends AbstractGenerator {
 
+	//counter for compileAids
+	private int aidlist_counter = 0;
+	private int aid_counter = 0;
+	private Collection<AidList> toVisitAids
+	
+	//counter for compileCurriculums 
+	private int curlist_counter = 0;
+	private int cur_counter = 0;
+	private int ms_counter = 0;
+	private Collection<Curriculum> toVisitCurriculums
+	
+	new(){
+		toVisitAids = null
+		toVisitCurriculums = null
+	}
+
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
+		
+		//Aid Generation
+		if(toVisitAids === null){
+			val allAidsToGenerate = resource.resourceSet.resources.map[r | r.allContents.toIterable.filter(AidList)].flatten
+			toVisitAids = new LinkedList<AidList>
+			toVisitAids.addAll(allAidsToGenerate)
+			fsa.generateFile("AidModelCreator.java", compileAids(toVisitAids))
+		}
+		
+		//Curriculum Generation
+		if(toVisitCurriculums === null){
+			val allCurriculumsToGenerate = resource.resourceSet.resources.map[r | r.allContents.toIterable.filter(Curriculum)].flatten
+			toVisitCurriculums = new LinkedList<Curriculum>
+			toVisitCurriculums.addAll(allCurriculumsToGenerate)
+			fsa.generateFile("CurriculumModelCreator.java", compileCurriculums(toVisitCurriculums))
+		}
+		
 //		fsa.generateFile('greetings.txt', 'People to greet: ' + 
 //			resource.allContents
 //				.filter(Greeting)
 //				.map[name]
 //				.join(', '))
 	}
+	
+	def compileAids(Collection<AidList> aids) '''
+		package de.hs_coburg.mgse.persistence.creators;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		
+		import de.hs_coburg.mgse.persistence.model.Aid;
+		
+		public class AidModelCreator {
+		    public static boolean createModel() {
+		        boolean resp = true;
+		        
+		        «FOR al: aids»
+		        	resp = resp && createModelPart«aidlist_counter++»();
+		        «ENDFOR»
+		        
+		        return resp;
+		    }
+		
+			//«aidlist_counter=0»: Aid
+		    «FOR al: aids»
+		    private static boolean createModelPart«aidlist_counter++»() {
+		    	try {
+		    		EntityManager em = HibernateUtil.getEntityManager();
+		    		em.getTransaction().begin();
+		    		
+		    		//implement me
+		    		«FOR aid: al.aidDefinitions»
+		    		Aid a«aid_counter» = new Aid();
+		    		a«aid_counter».setCompleteName("«aid.completeName»");
+		    		em.persist(a«aid_counter++»);
+		    		«ENDFOR»
+		    		
+		    		//commit and close Transaction
+		    		em.getTransaction().commit();
+		    		return true;
+		    	} catch(Exception e) {
+		    		e.printStackTrace();
+		    		return false;
+		    	}
+		    }
+		    «ENDFOR»
+		}
+	'''
+	
+	def compileCurriculums(Collection<Curriculum> curriculums) '''
+		package de.hs_coburg.mgse.persistence.creators;
+		
+		import de.hs_coburg.mgse.persistence.HibernateUtil;
+		import javax.persistence.EntityManager;		
+		
+		import de.hs_coburg.mgse.persistence.model.Aid;
+		import de.hs_coburg.mgse.persistence.model.CustomAid;
+		import de.hs_coburg.mgse.persistence.model.ModuleSpecification;
+		import de.hs_coburg.mgse.persistence.model.Module;
+		import de.hs_coburg.mgse.persistence.model.Curriculum;
+		import de.hs_coburg.mgse.persistence.model.ConcreteExamType;
+		import de.hs_coburg.mgse.persistence.model.StudyExaminationRegulations;
+		
+		public class CurriculumModelCreator {
+		    public static boolean createModel() {
+		        boolean resp = true;
+		        
+		        «FOR cur: curriculums»
+		        	resp = resp && createModelPart«curlist_counter++»();
+		        «ENDFOR»
+		        
+		        return resp;
+		    }
+		    
+		    //«curlist_counter=0»: Aid
+		    «FOR cur: curriculums»
+		    private static boolean createModelPart«curlist_counter++»() {
+		    	try {
+		    		EntityManager em = HibernateUtil.getEntityManager();
+		    		em.getTransaction().begin();
+		    		
+		    		Curriculum cur«cur_counter» = new Curriculum();
+		    		cur«cur_counter».setCompleteName("«cur.completeName»");
+		    		cur«cur_counter».setVersion(«cur.version»);
+		    		cur«cur_counter».setYear(«cur.year»);
+		    		cur«cur_counter».setSemester("«cur.semester»");
+		    		StudyExaminationRegulations ser«cur_counter» = (StudyExaminationRegulations) em.createQuery("SELECT ser FROM StudyExaminationRegulations ser WHERE ser.version = «cur.ser.version» AND ser.title = '«cur.ser.title.replace('\n','').replace('\t','')»' AND ser.foreword = '«cur.ser.foreword.replace('\n','').replace('\t','')»'").getSingleResult();
+		    		if(ser«cur_counter» != null) cur«cur_counter».setSer(ser«cur_counter»);
+		    		
+		    		//ModuleSpecification
+		    		«IF cur.curriculumEntries.empty === false»
+		    		List<ModuleSpecification> l_ms«cur_counter» = new ArrayList<ModuleSpecification>();
+		    			«FOR ms: cur.curriculumEntries»
+		    			ModuleSpecification ms«ms_counter» = new ModuleSpecification();
+		    			ms«ms_counter».setCompleteName("«ms.name»");
+		    			ms«ms_counter».setSemester(«ms.semester»);
+		    			ms«ms_counter».setRota("«ms.rota»");
+		    			
+		    			//IMPLEMENT ME URGENTLY
+		    			
+		    			
+		    			l_ms«cur_counter».add(ms«ms_counter++»);
+		    			«ENDFOR»
+		    		cur«cur_counter».add(l_ms«cur_counter»);
+		    		«ENDIF»
+		    		
+		    		em.persist(cur«cur_counter++»);
+		    		
+		    		//commit and close Transaction
+		    		em.getTransaction().commit();
+		    		return true;
+		    	} catch(Exception e) {
+		    		e.printStackTrace();
+		    		return false;
+		    	}
+		    }
+		    «ENDFOR»
+		}
+	'''
 }
