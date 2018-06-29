@@ -118,6 +118,7 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		import javax.persistence.EntityManager;
 		import java.util.ArrayList;
 		import java.util.List;
+		import java.util.stream.Collectors;
 		
 		import de.hs_coburg.mgse.persistence.model.Aid;
 		import de.hs_coburg.mgse.persistence.model.CustomAid;
@@ -174,7 +175,11 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    			«FOR cet: ms.moduleSpecification.concreteExamTypes»
 		    			ConcreteExamType cet«cet_counter» = new ConcreteExamType();
 		    			cet«cet_counter».setValue(«cet.value»);
-		    			ExamType et«cet_counter» = (ExamType) em.createQuery("SELECT et FROM ExamType et WHERE et.lowerBound = «cet.examType.lowerBound» AND et.upperBound = «cet.examType.upperBound»").getSingleResult();
+		    			List<ExamType> examTypes«ms_counter» = m«ms_counter».getExamTypes().stream().filter(et -> et.getExamTypeDeclaration().getDetails().getAbbreviation().equals("«cet.examType.examTypeDeclaration.details.information.abbreviation»")).collect(Collectors.toList());
+		    			if(examTypes«ms_counter».size() != 1){
+		    			    throw new RuntimeException("Should find a single result of exam type, but found " + examTypes«ms_counter».size());
+		    			}
+		    			ExamType et«cet_counter» = examTypes«ms_counter».get(0);
 		    			if(et«cet_counter» != null) cet«cet_counter».setExamType(et«cet_counter»);
 		    			l_cet«ms_counter».add(cet«cet_counter++»);
 		    			«ENDFOR»
@@ -208,7 +213,7 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    			//Professor (Tester)
 		    			List<Professor> l_p«ms_counter» = new ArrayList<Professor>();
 		    			«FOR p: ms.testers»
-		    			Professor p«prof_counter» = (Professor) em.createQuery("SELECT p FROM Professor p WHERE p.abbreviation = '«p.abbreviation»'").getSingleResult();
+		    			Professor p«prof_counter» = (Professor) em.createQuery("SELECT p FROM Professor p WHERE p.abbreviation = '«p.abbreviation.information.abbreviation»'").getSingleResult();
 		    			if(p«prof_counter» != null) l_p«ms_counter».add(p«prof_counter++»);
 		    			«ENDFOR»
 		    			ms«ms_counter».setTesters(l_p«ms_counter»);

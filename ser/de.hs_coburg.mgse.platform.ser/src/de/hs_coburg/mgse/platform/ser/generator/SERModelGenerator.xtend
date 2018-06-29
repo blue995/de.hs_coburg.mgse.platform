@@ -229,7 +229,7 @@ class SERModelGenerator extends AbstractGenerator {
 					em.getTransaction().begin();
 					
 					Module m«mp_counter» = new Module();
-					m«mp_counter».setCompleteName("«m.details.information.word»");
+					m«mp_counter».setCompleteName("«m.name»");
 					m«mp_counter».setEcts(«m.ects»);
 					m«mp_counter».setQuantifier(Double.parseDouble("«m.quantifier»"));
 					m«mp_counter».setSemesterHours(«m.semesterHours»);
