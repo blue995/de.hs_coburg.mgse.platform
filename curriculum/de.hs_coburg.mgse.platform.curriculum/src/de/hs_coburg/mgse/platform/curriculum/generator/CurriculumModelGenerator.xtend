@@ -29,6 +29,7 @@ class CurriculumModelGenerator extends AbstractGenerator {
 	private int curlist_counter = 0;
 	private int cur_counter = 0;
 	private int ms_counter = 0;
+	private int cet_counter = 0;
 	private Collection<Curriculum> toVisitCurriculums
 	
 	new(){
@@ -110,7 +111,9 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		package de.hs_coburg.mgse.persistence.creators;
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
-		import javax.persistence.EntityManager;		
+		import javax.persistence.EntityManager;
+		import java.util.ArrayList;
+		import java.util.List;
 		
 		import de.hs_coburg.mgse.persistence.model.Aid;
 		import de.hs_coburg.mgse.persistence.model.CustomAid;
@@ -118,6 +121,7 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		import de.hs_coburg.mgse.persistence.model.Module;
 		import de.hs_coburg.mgse.persistence.model.Curriculum;
 		import de.hs_coburg.mgse.persistence.model.ConcreteExamType;
+		import de.hs_coburg.mgse.persistence.model.ExamType;
 		import de.hs_coburg.mgse.persistence.model.StudyExaminationRegulations;
 		
 		public class CurriculumModelCreator {
@@ -149,18 +153,30 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    		//ModuleSpecification
 		    		«IF cur.curriculumEntries.empty === false»
 		    		List<ModuleSpecification> l_ms«cur_counter» = new ArrayList<ModuleSpecification>();
-		    			«FOR ms: cur.curriculumEntries»
+		    		«FOR ms: cur.curriculumEntries»
 		    			ModuleSpecification ms«ms_counter» = new ModuleSpecification();
 		    			ms«ms_counter».setCompleteName("«ms.name»");
 		    			ms«ms_counter».setSemester(«ms.semester»);
 		    			ms«ms_counter».setRota("«ms.rota»");
 		    			
-		    			//IMPLEMENT ME URGENTLY
+		    			//ModuleSpecification->Module
+		    			Module m«ms_counter» = (Module) em.createQuery("SELECT m FROM Module m WHERE m.completeName = '«ms.moduleSpecification.module.name»' AND m.ects = «ms.moduleSpecification.module.ects» AND m.quantifier = «ms.moduleSpecification.module.quantifier» AND m.semesterHours = «ms.moduleSpecification.module.semesterHours»").getSingleResult();
+		    			ms«ms_counter».setModule(m«ms_counter»);
 		    			
+		    			//ConcreteExamType->ExamType
+		    			List<ConcreteExamType> l_cet«ms_counter» = new ArrayList<ConcreteExamType>();
+		    			«FOR cet: ms.moduleSpecification.concreteExamTypes»
+		    			ConcreteExamType cet«cet_counter» = new ConcreteExamType();
+		    			cet«cet_counter».setValue(«cet.value»);
+		    			ExamType et«cet_counter» = (ExamType) em.createQuery("SELECT et FROM ExamType et WHERE et.lowerBound = «cet.examType.lowerBound» AND et.upperBound = «cet.examType.upperBound»").getSingleResult();
+		    			cet«cet_counter».setExamType(et«cet_counter»);
+		    			l_cet«ms_counter».add(cet«cet_counter++»);
+		    			«ENDFOR»
+		    			ms«ms_counter».setConcreteExamTypes(l_cet«ms_counter»);
 		    			
 		    			l_ms«cur_counter».add(ms«ms_counter++»);
 		    			«ENDFOR»
-		    		cur«cur_counter».add(l_ms«cur_counter»);
+		    		cur«cur_counter».setModuleSpecifications(l_ms«cur_counter»);
 		    		«ENDIF»
 		    		
 		    		em.persist(cur«cur_counter++»);

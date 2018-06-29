@@ -10,6 +10,7 @@ Eintraege [
 	- Modul SPO_B_IF.Prog1
 	- Leistungsnachweis SPO_B_IF.Prog1.schrPr (90)
 	- Lehrveranstaltungsart Pr, SU
+	- Hilfsmittel amE, nTR
 	- Pruefer EIF.TB, EIF.JEB
 	
 	Eintrag [E2]
@@ -18,5 +19,6 @@ Eintraege [
 	- Modul SPO_B_IF.GI
 	- Leistungsnachweis SPO_B_IF.GI.schrPr (90)
 	- Lehrveranstaltungsart Pr, SU
+	- Hilfsmittel nTR, "Eine DIN A4 Seite Zusammenfassung"
 	- Pruefer EIF.HS
 ]
