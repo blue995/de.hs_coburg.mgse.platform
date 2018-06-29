@@ -30,6 +30,10 @@ class CurriculumModelGenerator extends AbstractGenerator {
 	private int cur_counter = 0;
 	private int ms_counter = 0;
 	private int cet_counter = 0;
+	private int ctd_counter = 0;
+	private int ms_aid_counter = 0;
+	private int ms_caid_counter = 0;
+	private int prof_counter = 0;
 	private Collection<Curriculum> toVisitCurriculums
 	
 	new(){
@@ -123,6 +127,8 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		import de.hs_coburg.mgse.persistence.model.ConcreteExamType;
 		import de.hs_coburg.mgse.persistence.model.ExamType;
 		import de.hs_coburg.mgse.persistence.model.StudyExaminationRegulations;
+		import de.hs_coburg.mgse.persistence.model.CourseTypeDeclaration;
+		import de.hs_coburg.mgse.persistence.model.Professor;
 		
 		public class CurriculumModelCreator {
 		    public static boolean createModel() {
@@ -169,10 +175,43 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    			ConcreteExamType cet«cet_counter» = new ConcreteExamType();
 		    			cet«cet_counter».setValue(«cet.value»);
 		    			ExamType et«cet_counter» = (ExamType) em.createQuery("SELECT et FROM ExamType et WHERE et.lowerBound = «cet.examType.lowerBound» AND et.upperBound = «cet.examType.upperBound»").getSingleResult();
-		    			cet«cet_counter».setExamType(et«cet_counter»);
+		    			if(et«cet_counter» != null) cet«cet_counter».setExamType(et«cet_counter»);
 		    			l_cet«ms_counter».add(cet«cet_counter++»);
 		    			«ENDFOR»
 		    			ms«ms_counter».setConcreteExamTypes(l_cet«ms_counter»);
+		    			
+		    			//CourseTypeDeclaration
+		    			List<CourseTypeDeclaration> l_ctd«ms_counter» = new ArrayList<CourseTypeDeclaration>();
+		    			«FOR ctd: ms.moduleSpecification.courseTypes»
+		    			CourseTypeDeclaration ctd«ctd_counter» = (CourseTypeDeclaration) em.createQuery("SELECT ctd FROM CourseTypeDeclaration ctd WHERE ctd.details.abbreviation = '«ctd.details.information.abbreviation»' AND ctd.details.meaning = '«ctd.details.information.meaning»' AND ctd.details.word = '«ctd.details.information.word»'").getSingleResult();
+		    			if(ctd«ctd_counter» != null) l_ctd«ms_counter».add(ctd«ctd_counter++»);
+		    			«ENDFOR»
+		    			ms«ms_counter».setCourseTypes(l_ctd«ms_counter»);
+		    			
+		    			//Aid
+		    			List<Aid> l_aid«ms_counter» = new ArrayList<Aid>();
+		    			«FOR aid: ms.aids»
+		    			Aid aid«ms_aid_counter» = (Aid) em.createQuery("SELECT aid FROM Aid aid WHERE aid.completeName='«aid.completeName»'").getSingleResult();
+		    			if(aid«ms_aid_counter» != null) l_aid«ms_counter».add(aid«ms_aid_counter++»);
+		    			«ENDFOR»
+		    			ms«ms_counter».setAids(l_aid«ms_counter»);
+		    			
+		    			//CustomAid
+		    			List<CustomAid> l_caid«ms_counter» = new ArrayList<CustomAid>();
+		    			«FOR caid: ms.customAids»
+		    			CustomAid caid«ms_caid_counter» = new CustomAid();
+		    			caid«ms_caid_counter».setCompleteName("«caid»");
+		    			l_caid«ms_counter».add(caid«ms_caid_counter++»);
+		    			«ENDFOR»
+		    			ms«ms_counter».setCustomAids(l_caid«ms_counter»);
+		    			
+		    			//Professor (Tester)
+		    			List<Professor> l_p«ms_counter» = new ArrayList<Professor>();
+		    			«FOR p: ms.testers»
+		    			Professor p«prof_counter» = (Professor) em.createQuery("SELECT p FROM Professor p WHERE p.abbreviation = '«p.abbreviation»'").getSingleResult();
+		    			if(p«prof_counter» != null) l_p«ms_counter».add(p«prof_counter++»);
+		    			«ENDFOR»
+		    			ms«ms_counter».setTesters(l_p«ms_counter»);
 		    			
 		    			l_ms«cur_counter».add(ms«ms_counter++»);
 		    			«ENDFOR»
