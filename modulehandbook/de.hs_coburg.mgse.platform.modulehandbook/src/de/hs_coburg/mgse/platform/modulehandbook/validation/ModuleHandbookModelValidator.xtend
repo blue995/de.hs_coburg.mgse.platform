@@ -64,11 +64,12 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 	def checkSpecifiedModule(ModuleHandbook mhb) {
 
 		val possibleEntries = mhb.curriculum.curriculumEntries
-		val actualReferencedEntries = mhb.moduleDescriptions.map[md | md.curriculumEntry]
-
-		for (var int i = 0; i < possibleEntries.size(); i++) {
-			if (!possibleEntries.contains(actualReferencedEntries.get(i)))
-				error('Only modules which are specified in the referenced curriculum entry can be described in the module handbook', mhb, ModuleHandbookModelPackage.Literals.MODULE_HANDBOOK__MODULE_DESCRIPTIONS)
+		val moduleDescriptions = mhb.moduleDescriptions
+		for(moduleDescription : moduleDescriptions){
+			val refEntry = moduleDescription.curriculumEntry
+			if(!possibleEntries.contains(refEntry)){
+				error('''The module «refEntry.name» is not part of the specified curriculum.''', moduleDescription, ModuleHandbookModelPackage.Literals.MODULE_DESCRIPTION__CURRICULUM_ENTRY)
+			}
 		}
 	}
 }

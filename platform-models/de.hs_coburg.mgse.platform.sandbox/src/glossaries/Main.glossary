@@ -54,12 +54,28 @@ Sektion "Module"
 	[GI]
 	Wort: "Grundlagen der Informatik"
 	Abkuerzung: "GI"
+	
+	[DB]
+	Wort: "Datenbanken"
+	Abkuerzung: "DB"
+	
+	[SysProg]
+	Wort: "Systemprogrammierung"
+	Abkuerzung: "SysProg"
+	
+	[EBuis]
+	Wort: "E-Business"
+	Abkuerzung: "EBuis"
 Ende
 
 Sektion "Prüfungsarten"
 	[schrPr]
 	Wort: "Schriftliche Prüfung"
 	Abkuerzung: "schrPr"
+	
+	[mdlP]
+	Wort: "Mündliche Prüfung"
+	Abkuerzung: "mdlP"
 Ende
 
 Sektion "Lehrveranstaltungsarten"

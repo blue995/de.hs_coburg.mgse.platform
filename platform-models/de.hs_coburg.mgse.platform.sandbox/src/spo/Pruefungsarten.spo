@@ -2,4 +2,8 @@ Pruefungsarten [
 	Typ schrPr
 	Details Begriffe.schrPr
 	Einheit "Minuten"
+	
+	Typ mdlP
+	Details Begriffe.mdlP
+	Einheit "Minuten"
 ]

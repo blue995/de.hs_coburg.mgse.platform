@@ -177,7 +177,7 @@ class SERModelGenerator extends AbstractGenerator {
 					em.getTransaction().begin();
 					
 					«FOR et: etd.examTypeDeclarations»
-						ExamTypeDeclaration etd«et_counter» = new ExamTypeDeclaration();
+						ExamTypeDeclaration etd«et_counter=et_counter+1» = new ExamTypeDeclaration();
 						GlossaryEntry ge«et_counter» = (GlossaryEntry) em.createQuery("SELECT ge FROM GlossaryEntry ge WHERE ge.abbreviation = '«et.details.information.abbreviation»' AND ge.meaning = '«et.details.information.meaning»' AND ge.word = '«et.details.information.word»'").getSingleResult();
 						etd«et_counter».setDetails(ge«et_counter»);
 						etd«et_counter».setUnit("«et.unit»");

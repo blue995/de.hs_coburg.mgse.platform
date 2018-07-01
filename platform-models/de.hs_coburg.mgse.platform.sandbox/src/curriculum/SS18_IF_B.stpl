@@ -21,4 +21,36 @@ Eintraege [
 	- Lehrveranstaltungsart Pr, SU
 	- Hilfsmittel nTR, "Eine DIN A4 Seite Zusammenfassung"
 	- Pruefer EIF.HS
+	
+	Eintrag [E3]
+	- Semester 3
+	- Turnus jaehrlich
+	- Modul SPO_B_IF.DB
+	- Leistungsnachweis SPO_B_IF.DB.schrPr (120)
+	- Lehrveranstaltungsart Pr, SU
+	- Hilfsmittel amE
+	- Pruefer EIF.HS
+	
+	Eintrag [E4]
+	- Semester 3
+	- Turnus jaehrlich
+	- Modul SPO_B_IF.WPF
+	- Konkreter_Name "E-Business"
+	- Details Begriffe.EBuis
+	- Leistungsnachweis SPO_B_IF.WPF.schrPr (120)
+	- Lehrveranstaltungsart Pr, SU
+	- Hilfsmittel amE
+	- Pruefer EIF.HS
+	
+	Eintrag [E5]
+	- Semester 3
+	- Turnus jaehrlich
+	- Modul SPO_B_IF.WPF
+	- Konkreter_Name "Systemprogrammierung"
+	- Details Begriffe.SysProg
+	- Leistungsnachweis SPO_B_IF.WPF.schrPr (120)
+	- Lehrveranstaltungsart Pr, SU
+	- Hilfsmittel amE
+	- Pruefer EIF.HS
+	
 ]
