@@ -4,8 +4,10 @@ Abschlussarten [
 ]
 Abschlussunterarten [
 	- [Science]: "Science"
+	- [Arts]: "Arts"
 ]
 Abschluesse [
 	- [BSc]: Bachelor of Science [Details: Begriffe.Bachelor_of_Science]
 	- [MSc]: Master of Science [Details: Begriffe.Master_of_Science]
+	- [MA]: Master of Arts [Details: Begriffe.Master_of_Arts]
 ]
