@@ -11,6 +11,9 @@ import org.omg.stub.java.rmi._Remote_Stub
 import de.hs_coburg.mgse.platform.curriculum.curriculumModel.ConcreteExamType
 import de.hs_coburg.mgse.platform.curriculum.utils.ConcreteExamTypeBehavior
 import de.hs_coburg.mgse.platform.curriculum.utils.CurriculumEntryBehavior
+import java.util.HashMap
+import de.hs_coburg.mgse.platform.ser.validation.ModuleBehavior
+import de.hs_coburg.mgse.platform.curriculum.curriculumModel.ModuleSpecification
 
 /**
  * This class contains custom validation rules. 
@@ -20,6 +23,7 @@ import de.hs_coburg.mgse.platform.curriculum.utils.CurriculumEntryBehavior
 class CurriculumModelValidator extends AbstractCurriculumModelValidator {
 	extension ConcreteExamTypeBehavior = new ConcreteExamTypeBehavior
 	extension CurriculumEntryBehavior = new CurriculumEntryBehavior
+	extension ModuleBehavior = new ModuleBehavior
 //	public static val INVALID_NAME = 'invalidName'
 //
 //	@Check
@@ -51,18 +55,45 @@ class CurriculumModelValidator extends AbstractCurriculumModelValidator {
 	// "All specified modules of the curriculum have to be specified by the referenced SER."
 	@Check
 	def checkSpecifiedModules(Curriculum cur) {
-		val studySections = cur.ser.studySections
-		val curEntries = cur.curriculumEntries
+		val allModules= cur.ser.studySections.map[ss | ss.modules].flatten
+		val expectedModules = new HashMap
 		
-		for (var int i = 0; i < studySections.size(); i++) {
-			val possibleModules = studySections.get(i).modules
+		for(module : allModules){
+			var count = 1
+			if(module.abstract){
+				count = module.count
+			}
+			expectedModules.put(module, count)
+		}
+		
+		val referencedModules = cur.curriculumEntries.map[ce | ce.moduleSpecification.module]
+		for(expectedModule : expectedModules.keySet){
+			val referencedModulesFiltered = referencedModules.filter[rm | rm === expectedModule]
+			val actualCount = referencedModulesFiltered.size
+			val expectedCount = expectedModules.get(expectedModule)
+			if(actualCount != expectedCount){
+				error('''According to the study and exmination regulations the module «expectedModule.name» has to be specified «expectedCount» times. Currently this module is specified «actualCount» times.''', cur, CurriculumModelPackage.Literals.CURRICULUM__NAME)
+			}
+		}
+	}
+	
+	@Check
+	def checkDetails(ModuleSpecification specification){
+		val isAbstract = specification.module.abstract
+		if(isAbstract){
 			
-			for (var int j = 0; j < curEntries.size(); j++) {
-				val specifiedModuleSpecification = curEntries.get(j).moduleSpecification.module
-					
-				if (!possibleModules.contains(specifiedModuleSpecification)) {
-					error('All specified modules of the curriculum have to be specified by the referenced study examination regulation', cur, CurriculumModelPackage.Literals.CURRICULUM__CURRICULUM_ENTRIES)
-				}
+			if(specification.details === null){
+				error('''You are referencing an abstract module. You have to specify details about this module.''', specification, CurriculumModelPackage.Literals.MODULE_SPECIFICATION__MODULE)
+			}
+			if(specification.completeName === null){
+				error('''You are referencing an abstract module. You have to specify the complete name of module.''', specification, CurriculumModelPackage.Literals.MODULE_SPECIFICATION__MODULE)
+			}
+		} else {
+			if(specification.details !== null){
+				error('''Module is already concrete.''', specification, CurriculumModelPackage.Literals.MODULE_SPECIFICATION__DETAILS)
+			}
+			if(specification.completeName !== null){
+				error('''Module is already concrete.''', specification, CurriculumModelPackage.Literals.MODULE_SPECIFICATION__COMPLETE_NAME)
 			}
 		}
 	}

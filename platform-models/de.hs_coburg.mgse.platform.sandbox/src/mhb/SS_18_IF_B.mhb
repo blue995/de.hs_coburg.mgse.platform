@@ -27,23 +27,23 @@ Eintraege [
 	
 	
 	Start		   
-	Modul SS_18_IF_B.E2
-	Verantwortlicher EIF.HS
-	Dozent EIF.HS
-	Sprache "deutsch"
-	Qualifikationsziele "Fachlich-methodische Kompetenzen: Studierende sollen ..."
-	Arbeitsaufwand [
-			Beschreibung "Präsenz (Seminaristischer Unterricht: 60 h, Übung: 60 h)"
-			Aufwand	90
-			
-			Beschreibung "Eigenarbeit (Nachbereitung Seminaristischer Unterricht: 40 h, Übung: 30 h, Prüfungsvorbereitung: 50 h)"
-			Aufwand	120
-	]
-	Zulassungsvorraussetzungen [
-		Vorraussetzung "keine"
-	]
-	Lerninhalte "Einführung, vom Problem zur Softwarelösung, Konzepte von Programmiersprachen, elementare Algorithmen, Übersetzung von Programmiersprachen"
-	Medienformen "Tafel", "Skript"
-	Literatur "H.-P. Gumm, M. Sommer: Einführung in die Informatik, Oldenbourg Verlag, München / Wien, 10. Auflage, 2012"
+		Modul SS_18_IF_B.E2
+		Verantwortlicher EIF.HS
+		Dozent EIF.HS
+		Sprache "deutsch"
+		Qualifikationsziele "Fachlich-methodische Kompetenzen: Studierende sollen ..."
+		Arbeitsaufwand [
+				Beschreibung "Präsenz (Seminaristischer Unterricht: 60 h, Übung: 60 h)"
+				Aufwand	90
+				
+				Beschreibung "Eigenarbeit (Nachbereitung Seminaristischer Unterricht: 40 h, Übung: 30 h, Prüfungsvorbereitung: 50 h)"
+				Aufwand	120
+		]
+		Zulassungsvorraussetzungen [
+			Vorraussetzung "keine"
+		]
+		Lerninhalte "Einführung, vom Problem zur Softwarelösung, Konzepte von Programmiersprachen, elementare Algorithmen, Übersetzung von Programmiersprachen"
+		Medienformen "Tafel", "Skript"
+		Literatur "H.-P. Gumm, M. Sommer: Einführung in die Informatik, Oldenbourg Verlag, München / Wien, 10. Auflage, 2012"
 	Ende
 ]

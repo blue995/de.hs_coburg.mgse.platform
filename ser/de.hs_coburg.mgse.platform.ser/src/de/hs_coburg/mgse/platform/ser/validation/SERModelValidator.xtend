@@ -69,11 +69,11 @@ class SERModelValidator extends AbstractSERModelValidator {
 	@Check
 	def checkTotalECTS(Module module) {
 		val totalEcts = module.calculateEcts
-		val ectsCount = module.ects * module.count
 		
-		if (module.abstract)
-			if (totalEcts != ectsCount) {
-				error('The total ECTS ' + totalEcts + ' do not match ' + ectsCount, module, SERModelPackage.Literals.MODULE__ECTS)
+		if (module.abstract){
+			if (totalEcts != module.ects * module.count) {
+				error('The total ECTS ' + totalEcts + ' do not match ' + (module.ects * module.count), module, SERModelPackage.Literals.MODULE__ECTS)
+			}
 		}
 		else {
 			if (totalEcts != module.ects) {

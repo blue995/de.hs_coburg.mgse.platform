@@ -12,6 +12,7 @@ import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import java.util.Collection
 import java.util.LinkedList
+import de.hs_coburg.mgse.platform.ser.validation.ModuleBehavior
 
 /**
  * Generates code from your model files on save.
@@ -19,6 +20,7 @@ import java.util.LinkedList
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
  */
 class CurriculumModelGenerator extends AbstractGenerator {
+	extension ModuleBehavior = new ModuleBehavior
 
 	//counter for compileAids
 	private int aidlist_counter = 0;
@@ -116,23 +118,10 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
 		import javax.persistence.EntityManager;
-		import javax.persistence.TypedQuery;
-		import javax.persistence.criteria.CriteriaBuilder;
-		import javax.persistence.criteria.CriteriaQuery;
-		import javax.persistence.criteria.Root;
 		import java.util.*;
 		import java.util.stream.Collectors;
 		
-		import de.hs_coburg.mgse.persistence.model.Aid;
-		import de.hs_coburg.mgse.persistence.model.CustomAid;
-		import de.hs_coburg.mgse.persistence.model.ModuleSpecification;
-		import de.hs_coburg.mgse.persistence.model.Module;
-		import de.hs_coburg.mgse.persistence.model.Curriculum;
-		import de.hs_coburg.mgse.persistence.model.ConcreteExamType;
-		import de.hs_coburg.mgse.persistence.model.ExamType;
-		import de.hs_coburg.mgse.persistence.model.StudyExaminationRegulations;
-		import de.hs_coburg.mgse.persistence.model.CourseTypeDeclaration;
-		import de.hs_coburg.mgse.persistence.model.Professor;
+		import de.hs_coburg.mgse.persistence.model.*;
 		
 		public class CurriculumModelCreator {
 		    public static boolean createModel() {
@@ -172,6 +161,15 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    			//ModuleSpecification->Module
 		    			Module m«ms_counter» = (Module) em.createQuery("SELECT m FROM Module m WHERE m.completeName = '«ms.moduleSpecification.module.name»' AND m.ects = «ms.moduleSpecification.module.ects» AND m.quantifier = «ms.moduleSpecification.module.quantifier» AND m.semesterHours = «ms.moduleSpecification.module.semesterHours»").getSingleResult();
 		    			ms«ms_counter».setModule(m«ms_counter»);
+		    			«IF ms.moduleSpecification.module.abstract»
+		    			List<GlossaryEntry> entries«ms_counter» = HibernateUtil.getAllEntries(GlossaryEntry.class, em);
+		    			List<GlossaryEntry> filtered«ms_counter» = entries«ms_counter».stream().filter(ge -> ge.getAbbreviation().equals("«ms.moduleSpecification.details.information.abbreviation»")).collect(Collectors.toList());
+		    			if(filtered«ms_counter».size() != 1){
+		    				throw new RuntimeException("Multiple GlossaryEntries with abbreviation «ms.moduleSpecification.details.information.abbreviation»:" + filtered«ms_counter»);
+		    			}
+		    			GlossaryEntry entry«ms_counter» = filtered«ms_counter».get(0);
+		    			ms«ms_counter».setDetails(entry«ms_counter»);
+		    			«ENDIF»
 		    			
 		    			//ConcreteExamType->ExamType
 		    			List<ConcreteExamType> l_cet«ms_counter» = new ArrayList<ConcreteExamType>();
@@ -216,11 +214,9 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    			//Professor (Tester)
 		    			List<Professor> l_p«ms_counter» = new LinkedList<Professor>();
 		    			«IF !ms.testers.empty»
-		    			l_p«ms_counter».addAll(getAllEntries(Professor.class, em));
+		    			l_p«ms_counter».addAll(HibernateUtil.getAllEntries(Professor.class, em));
 		    			l_p«ms_counter» = l_p«ms_counter».stream().
-		    				«FOR p: ms.testers»
-		    				filter(_p -> _p.getAbbreviation().getAbbreviation().equals("«p.abbreviation.information.abbreviation»")).
-		    				«ENDFOR»
+		    				filter(_p -> false «FOR p: ms.testers»|| _p.getAbbreviation().getAbbreviation().equals("«p.abbreviation.information.abbreviation»")«ENDFOR»).
 		    				collect(Collectors.toList());	
 		    			«ENDIF»	    			
 		    			ms«ms_counter».setTesters(l_p«ms_counter»);
@@ -241,19 +237,6 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    	}
 		    }
 		    «ENDFOR»
-		    
-		    «compileGetAll»
 		}
-	'''
-	
-	def compileGetAll()'''
-	public static <E> List<E> getAllEntries(Class<E> clazz, EntityManager em){
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<E> cq = cb.createQuery(clazz);
-		Root<E> rootEntry = cq.from(clazz);
-		CriteriaQuery<E> all = cq.select(rootEntry);
-		TypedQuery<E> allQuery = em.createQuery(all);
-		return allQuery.getResultList();
-	}
 	'''
 }

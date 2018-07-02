@@ -92,7 +92,7 @@ Studienabschnitte [
 	Modules [
 		Modul Prog1
 		ECTS 5
-		Gewichtung 2.2
+		Gewichtung 8
 		SWS 4
 		Modulart "Pflichtmodul"
 		Details Begriffe.Prog1
@@ -106,10 +106,43 @@ Studienabschnitte [
 		
 		Modul GI
 		ECTS 7
-		Gewichtung 2.2
+		Gewichtung 4
 		SWS 6
 		Modulart "Pflichtmodul"
 		Details Begriffe.GI
+		Pruefungsarten [
+			Name schrPr
+			Pruefungsart schrPr [ 90 bis 120 ]
+		]
+		Lehrveranstaltungsarten[
+			Pr, SU, UE, V
+		]   
+	]
+	
+	Startsemester 3
+	Endsemester 4
+	Bezeichnung "Praktisches Fachsemester"
+	Modules [
+		Modul DB
+		ECTS 5
+		Gewichtung 8
+		SWS 4
+		Modulart "Pflichtmodul"
+		Details Begriffe.DB
+		Pruefungsarten [
+			Name schrPr
+			Pruefungsart schrPr [ 90 bis 120 ]
+		]
+		Lehrveranstaltungsarten[
+			Pr, SU, UE
+		]
+		
+		Modul WPF
+		ECTS 7
+		Gewichtung 4
+		SWS 6
+		Modulart "Wahlpflichtmodul"
+		Anzahl 2
 		Pruefungsarten [
 			Name schrPr
 			Pruefungsart schrPr [ 90 bis 120 ]
