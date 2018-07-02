@@ -154,7 +154,8 @@ class ModuleHandbookModelGenerator extends AbstractGenerator {
 		    		«ENDIF»
 		    		
 		    		// if (curriculum.getModuleHandbooks() == null) curriculum.setModuleHandbooks(new ArrayList<>());
-		    		// curriculum.getModuleHandbooks().add(mh«mh_counter»);
+		    		// mh«mh_counter».setCurriculum(curriculum);
+		    		
 		    		
 		    		em.persist(mh«mh_counter++»);
 		    		em.getTransaction().commit();
