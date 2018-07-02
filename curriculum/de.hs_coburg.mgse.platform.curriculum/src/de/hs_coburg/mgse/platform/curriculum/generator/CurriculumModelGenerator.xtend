@@ -216,9 +216,7 @@ class CurriculumModelGenerator extends AbstractGenerator {
 		    			«IF !ms.testers.empty»
 		    			l_p«ms_counter».addAll(HibernateUtil.getAllEntries(Professor.class, em));
 		    			l_p«ms_counter» = l_p«ms_counter».stream().
-		    				«FOR p: ms.testers»
-		    				filter(_p -> _p.getAbbreviation().getAbbreviation().equals("«p.abbreviation.information.abbreviation»")).
-		    				«ENDFOR»
+		    				filter(_p -> false «FOR p: ms.testers»|| _p.getAbbreviation().getAbbreviation().equals("«p.abbreviation.information.abbreviation»")«ENDFOR»).
 		    				collect(Collectors.toList());	
 		    			«ENDIF»	    			
 		    			ms«ms_counter».setTesters(l_p«ms_counter»);
