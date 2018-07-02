@@ -7,11 +7,11 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
-//import org.eclipse.xtext.naming.IQualifiedNameProvider
-
-//import com.google.inject.Inject
 
 import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleHandbook
+import java.util.Collection
+import java.util.LinkedList
+
 //import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleDescription
 //import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.Workload
 //import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleAdmissionRequirement
@@ -24,31 +24,45 @@ import de.hs_coburg.mgse.platform.modulehandbook.moduleHandbookModel.ModuleHandb
  */
 class ModuleHandbookModelGenerator extends AbstractGenerator {
 	
-	//@Inject extension IQualifiedNameProvider
+	private int mh_list_counter = 0;
+	private int mh_counter = 0;
+	private int md_counter = 0;
+	private int wl_counter = 0;
+	private int prof_counter = 0;
+	private int mar_counter = 0;
+	
+	private Collection<ModuleHandbook> toVisitModuleHandbooks;
+	
+	new() {
+		toVisitModuleHandbooks = null
+	}
+	
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		
-//		for(e: resource.allContents.toIterable.filter(ModuleHandbook)) {
-//			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.compile);
-//		}
 
-		for(e: resource.allContents.toIterable.filter(ModuleHandbook)) {
-			fsa.generateFile(
-				"ModuleHandbookModelCreator.java",
-            	e.compile
-			)
+		if(toVisitModuleHandbooks === null){
+			val allModuleHandbooksToGenerate = resource.resourceSet.resources.map[r | r.allContents.toIterable.filter(ModuleHandbook)].flatten;
+			toVisitModuleHandbooks = new LinkedList<ModuleHandbook>;
+			toVisitModuleHandbooks.addAll(allModuleHandbooksToGenerate);
+			fsa.generateFile("ModuleHandbookModelCreator.java", compileModuleHandbooks(toVisitModuleHandbooks));
 		}
 	}
 	
-	def compile(ModuleHandbook mh) ''' 
+	def compileModuleHandbooks(Collection<ModuleHandbook> module_handbook_list) '''
 		package de.hs_coburg.mgse.persistence.creators;
 		
 		import de.hs_coburg.mgse.persistence.HibernateUtil;
-		import javax.persistence.EntityManager;		
+		import javax.persistence.EntityManager;
 		import java.util.ArrayList;
 		import java.util.List;
 		
+		import javax.persistence.TypedQuery;
+		import javax.persistence.criteria.CriteriaBuilder;
+		import javax.persistence.criteria.CriteriaQuery;
+		import javax.persistence.criteria.Root;
+		
 		import de.hs_coburg.mgse.persistence.model.ModuleHandbook;
 		import de.hs_coburg.mgse.persistence.model.ModuleDescription;
+		import de.hs_coburg.mgse.persistence.model.Media;
 		import de.hs_coburg.mgse.persistence.model.Workload;
 		import de.hs_coburg.mgse.persistence.model.ModuleAdmissionRequirement;
 		
@@ -58,63 +72,115 @@ class ModuleHandbookModelGenerator extends AbstractGenerator {
 		
 		
 		public class ModuleHandbookModelCreator {
-			public static boolean createModel() {
-		        boolean result = true;
+		    public static boolean createModel() {
+		        boolean resp = true;
 		        
-		        try {
-		            EntityManager em = HibernateUtil.getEntityManager();
-		            em.getTransaction().begin();
-		            
-		            ModuleHandbook module_handbook = new ModuleHandbook();
-		            List<ModuleDescription> module_description_list = new ArrayList<ModuleDescription>();
-		
-					Curriculum curriculum = (Curriculum) em.createQuery("SELECT x FROM Curriculum x WHERE x.completeName = '«mh.curriculum.completeName»'").getSingleResult();
-					ModuleSpecification curriculum_entry;
-					ModuleDescription module_desc;
-					
-					«FOR md: mh.moduleDescriptions»
-						curriculum_entry = (ModuleSpecification) em.createQuery("SELECT x FROM ModuleSpecification x WHERE x.completeName = '«md.curriculumEntry.name»'").getSingleResult();
-						
-						if (curriculum_entry != null) {
-							module_desc = new ModuleDescription();
-							
-							List<Professor> lecture_list = new ArrayList<Professor>();
-							Professor lecture;
-							
-							«FOR module_lecture: md.lectures»
-								lecture = (Professor) em.createQuery("SELECT x FROM Professor x WHERE x.completeName = '«module_lecture.name»'").getSingleResult();
-								if (lecture != null) { lecture_list.add(lecture); }
-							«ENDFOR»
-							
-							module_desc.setCurriculumEntry(curriculum_entry);
-							module_desc.setLanguage("«md.language»");
-							module_desc.setQualificationGoals("«md.qualificationGoals»");
-							module_desc.setContent("«md.content»");
-							module_desc.setLiterature("«md.literature»");
-							if (lecture_list != null && lecture_list.size() > 0) module_desc.setLectures(lecture_list);
-							//module_desc.setAdmissionRequirements(«md.admissionRequirements»);
-							//module_desc.setWorkloads(«md.workloads»);
-							//module_desc.setMedias(«md.medias»);
-							
-							module_description_list.add(module_desc);
-						}
-						
-					«ENDFOR»
-					module_handbook.setModuleDescriptions(module_description_list);
-					// em.persist(module_handbook);
-					
-					curriculum.getModuleHandbooks().add(module_handbook);
-					em.merge(curriculum);
-					
-		            em.getTransaction().commit();
-		            //em.close();
-		        } catch(Exception e) {
-		            e.printStackTrace();
-		            result = false;
-		        }
+		        «FOR mh: module_handbook_list»
+		        	resp = resp && createModelPart«mh_list_counter++»();
+		        «ENDFOR»
 		        
-		        return result;
+		        return resp;
 		    }
+		    
+		    //«mh_list_counter=0»: ModuleHandbook
+		    «FOR mh: module_handbook_list»
+		    private static boolean createModelPart«mh_list_counter++»() {
+		    	try {
+		    		EntityManager em = HibernateUtil.getEntityManager();
+		    		em.getTransaction().begin();
+		    		
+		    		
+		    		Curriculum curriculum = (Curriculum) em.createQuery("SELECT x FROM Curriculum x WHERE x.completeName = '«mh.curriculum.completeName»' AND x.version = «mh.curriculum.version» AND x.semester = '«mh.curriculum.semester»' AND x.year = «mh.curriculum.year»").getSingleResult();
+		    		
+		    		ModuleHandbook mh«mh_counter» = new ModuleHandbook();
+		    		mh«mh_counter».setCurriculum(curriculum);
+		    		
+		    		«IF mh.moduleDescriptions.empty === false»
+		    		List<ModuleDescription> module_desc_list«mh_counter» = new ArrayList<ModuleDescription>();
+		    		
+		    		«FOR md: mh.moduleDescriptions»
+		    			ModuleDescription module_desc«md_counter» = new ModuleDescription();
+		    			
+		    			module_desc«md_counter».setLanguage("«md.language»");
+		    			module_desc«md_counter».setQualificationGoals("«md.qualificationGoals»");
+		    			module_desc«md_counter».setContent("«md.content»");
+		    			module_desc«md_counter».setLiterature("«md.literature»");
+		    			module_desc«md_counter».setPrerequisite("«md.prerequesite»");
+		    			
+		    			// CurriculumEntry (aka ModuleSpecification)
+		    			ModuleSpecification module_specification«md_counter» = (ModuleSpecification) em.createQuery("SELECT x FROM ModuleSpecification x WHERE x.completeName = '«md.curriculumEntry.name»'").getSingleResult();
+		    			module_desc«md_counter».setCurriculumEntry(module_specification«md_counter»);
+		    			
+		    			// Professors
+		    			List<Professor> prof_list«md_counter» = new ArrayList<Professor>();
+		    			«FOR prof: md.lectures»
+		    				Professor professor«prof_counter» = (Professor) em.createQuery("SELECT x FROM Professor x WHERE x.email = '«prof.email»'").getSingleResult();
+		    				prof_list«md_counter».add(professor«prof_counter++»);
+		    			«ENDFOR»
+		    			module_desc«md_counter».setLectures(prof_list«md_counter»);
+		    			
+		    			
+		    			// Workloads
+		    			List<Workload> workload_list«md_counter» = new ArrayList<Workload>();
+		    			«FOR wl: md.workloads»
+		    				Workload workload«wl_counter» = new Workload();
+		    				workload«wl_counter».setEffort(«wl.effort»);
+		    				workload«wl_counter».setDescription("«wl.description»");
+		    				workload_list«md_counter».add(workload«wl_counter++»);
+		    			«ENDFOR»
+		    			module_desc«md_counter».setWorkloads(workload_list«md_counter»);
+		    			
+		    			// Medias
+		    			List<Media> media_list«md_counter» = new ArrayList<Media>();
+		    			Media media«md_counter» = new Media();
+		    			media«md_counter».setCompleteName("«md.medias»");
+		    			media_list«md_counter».add(media«md_counter»);
+		    			module_desc«md_counter».setMedias(media_list«md_counter»);
+		    			
+		    			// ModuleAdmissionRequirements
+		    			List<ModuleAdmissionRequirement> mar_list«md_counter» = new ArrayList<ModuleAdmissionRequirement>();
+		    			«FOR mar: md.admissionRequirements»
+		    				ModuleAdmissionRequirement mar«mar_counter» = new ModuleAdmissionRequirement();
+		    				mar«mar_counter».setText("«mar.text»");
+		    				mar_list«md_counter».add(mar«mar_counter++»);
+		    			«ENDFOR»
+		    			module_desc«md_counter».setAdmissionRequirements(mar_list«md_counter»);
+		    			
+		    			
+		    			module_desc_list«mh_counter».add(module_desc«md_counter++»);
+		    		«ENDFOR»
+		    		
+		    		mh«mh_counter».setModuleDescriptions(module_desc_list«mh_counter»);
+		    		«ENDIF»
+		    		
+		    		// if (curriculum.getModuleHandbooks() == null) curriculum.setModuleHandbooks(new ArrayList<>());
+		    		// curriculum.getModuleHandbooks().add(mh«mh_counter»);
+		    		
+		    		em.persist(mh«mh_counter++»);
+		    		em.getTransaction().commit();
+		    		
+		    		
+		    		return true;
+		    	} catch(Exception e) {
+		    		e.printStackTrace();
+		    		return false;
+		    	}
+		    }
+    		«ENDFOR»
+		
+    		«compileGetAll»
 		}
+	'''
+	
+	
+	def compileGetAll()'''
+	public static <E> List<E> getAllEntries(Class<E> clazz, EntityManager em){
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<E> cq = cb.createQuery(clazz);
+		Root<E> rootEntry = cq.from(clazz);
+		CriteriaQuery<E> all = cq.select(rootEntry);
+		TypedQuery<E> allQuery = em.createQuery(all);
+		return allQuery.getResultList();
+	}
 	'''
 }

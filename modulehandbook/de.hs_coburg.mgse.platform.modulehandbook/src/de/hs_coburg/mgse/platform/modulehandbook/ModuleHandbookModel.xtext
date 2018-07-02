@@ -29,6 +29,7 @@ ModuleDescription:
 	'Lerninhalte' content=STRING
 	'Medienformen' (medias+=STRING) (',' medias+=STRING)*
 	'Literatur' literature=STRING
+	('Vorbedingung' prerequesite=STRING)? 
 	'Ende'
 ;
 
