@@ -26,10 +26,10 @@ ModuleDescription:
 	'Qualifikationsziele' qualificationGoals=STRING
 	'Arbeitsaufwand' '[' (workloads+=Workload)+ ']'
 	'Zulassungsvorraussetzungen' '[' (admissionRequirements+=ModuleAdmissionRequirement)+ ']'
+	'Vorbedingung' prerequesite=STRING
 	'Lerninhalte' content=STRING
 	'Medienformen' (medias+=STRING) (',' medias+=STRING)*
 	'Literatur' literature=STRING
-	('Vorbedingung' prerequesite=STRING)? 
 	'Ende'
 ;
 

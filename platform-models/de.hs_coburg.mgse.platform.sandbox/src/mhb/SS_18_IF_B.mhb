@@ -10,19 +10,19 @@ Eintraege [
 	Sprache "deutsch"
 	Qualifikationsziele "Fachlich-methodische Kompetenzen: Studierende sollen ..."
 	Arbeitsaufwand [
-			Beschreibung "Präsenz  (30 h Seminaristischer Unterricht, 30 h Übung)"
+			Beschreibung "Praesenz  (30 h Seminaristischer Unterricht, 30 h Uebung)"
 			Aufwand	60
 			
-			Beschreibung "Eigenarbeit (30h Vor- und Nachbereitung des Lehrstoffs, 30h Lösung von Übungsaufgaben, 30h Prüfungsvorbereitung)"
+			Beschreibung "Eigenarbeit (30h Vor- und Nachbereitung des Lehrstoffs, 30h Loesung von Übungsaufgaben, 30h Pruefungsvorbereitung)"
 			Aufwand	90
 	]
 	Zulassungsvorraussetzungen [
 		Vorraussetzung "keine"
 	]
-	Lerninhalte "Einführung, Datentypen und Ausdr�cke, Kontrollstrukturen, Arrays und Zeiger, Prozedurale Programmierung, Rekursion, Objektorientierte Programmierung Teil 1, Strings, Exception Handling"
+	Vorbedingung "keine"
+	Lerninhalte "Einfuehrung, Datentypen und Ausdruecke, Kontrollstrukturen, Arrays und Zeiger, Prozedurale Programmierung, Rekursion, Objektorientierte Programmierung Teil 1, Strings, Exception Handling"
 	Medienformen "Tafel", "Skript"
 	Literatur "Ullenboom, Christian: Java ist auch eine Insel, Galileo Computing jeweils in der neusten Auflage"
-	Vorbedingung "leichte Programmierkenntnisse"
 	Ende
 	
 	
@@ -33,17 +33,18 @@ Eintraege [
 		Sprache "deutsch"
 		Qualifikationsziele "Fachlich-methodische Kompetenzen: Studierende sollen ..."
 		Arbeitsaufwand [
-				Beschreibung "Präsenz (Seminaristischer Unterricht: 60 h, Übung: 60 h)"
+				Beschreibung "Praesenz (Seminaristischer Unterricht: 60 h, Uebung: 60 h)"
 				Aufwand	90
 				
-				Beschreibung "Eigenarbeit (Nachbereitung Seminaristischer Unterricht: 40 h, Übung: 30 h, Prüfungsvorbereitung: 50 h)"
+				Beschreibung "Eigenarbeit (Nachbereitung Seminaristischer Unterricht: 40 h, Übung: 30 h, Pruefungsvorbereitung: 50 h)"
 				Aufwand	120
 		]
 		Zulassungsvorraussetzungen [
 			Vorraussetzung "keine"
 		]
-		Lerninhalte "Einführung, vom Problem zur Softwarelösung, Konzepte von Programmiersprachen, elementare Algorithmen, Übersetzung von Programmiersprachen"
+		Vorbedingung "keine"
+		Lerninhalte "Einfuehrung, vom Problem zur Softwareloesung, Konzepte von Programmiersprachen, elementare Algorithmen, Uebersetzung von Programmiersprachen"
 		Medienformen "Tafel", "Skript"
-		Literatur "H.-P. Gumm, M. Sommer: Einführung in die Informatik, Oldenbourg Verlag, München / Wien, 10. Auflage, 2012"
+		Literatur "H.-P. Gumm, M. Sommer: Einfuehrung in die Informatik, Oldenbourg Verlag, Muenchen / Wien, 10. Auflage, 2012"
 	Ende
 ]
