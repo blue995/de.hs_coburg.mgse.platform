@@ -52,7 +52,7 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 	def checkOverallEffort(ModuleDescription md) {
 		val workloads = md.workloads
 		val moduleEffort = md.calculateMaxWorkload
-		var int effortSum = workloads.map[wl | wl.effort].reduce[s1, s2 | s1 + s2]
+		var effortSum = workloads.map[wl | wl.effort].reduce[s1, s2 | s1 + s2]
 		
 		if (moduleEffort != effortSum) {
 			error('''The overall effort for all workloads must be equal to «moduleEffort» but actually is «effortSum»''', md, ModuleHandbookModelPackage.Literals.MODULE_DESCRIPTION__WORKLOADS)
@@ -69,6 +69,20 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 			val refEntry = moduleDescription.curriculumEntry
 			if(!possibleEntries.contains(refEntry)){
 				error('''The module «refEntry.name» is not part of the specified curriculum.''', moduleDescription, ModuleHandbookModelPackage.Literals.MODULE_DESCRIPTION__CURRICULUM_ENTRY)
+			}
+		}
+	}
+	
+	// "All modules which are specified in the referenced curriculum entry musst be described in the module handbook."
+	@Check
+	def checkSpecifiedModules(ModuleHandbook mhb) {
+
+		val curriculum_entries = mhb.curriculum.curriculumEntries
+		val module_descriptions = mhb.moduleDescriptions
+		
+		for(curriculum_entry : curriculum_entries) {
+			if(!module_descriptions.contains(curriculum_entry)) {
+				error('''The module «curriculum_entry.name» needs to be defined according to specified curriculum.''', curriculum_entry, ModuleHandbookModelPackage.Literals.MODULE_DESCRIPTION__CURRICULUM_ENTRY)
 			}
 		}
 	}

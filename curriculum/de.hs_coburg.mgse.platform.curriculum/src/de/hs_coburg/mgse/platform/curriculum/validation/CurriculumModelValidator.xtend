@@ -143,7 +143,7 @@ class CurriculumModelValidator extends AbstractCurriculumModelValidator {
 		
 		for (var int i = 0; i < actualCourseTypes.size(); i++) {
 			if (!possibleCourseTypes.contains(actualCourseTypes.get(i)))
-				error('The course type of a curriculum entry must be defined in the referenced module', cEntry, CurriculumModelPackage.Literals.CURRICULUM__YEAR)
+				error('The course type of a curriculum entry must be defined in the referenced module', cEntry.moduleSpecification, CurriculumModelPackage.Literals.MODULE_SPECIFICATION__COURSE_TYPES);
 		}
 	}	
 }
