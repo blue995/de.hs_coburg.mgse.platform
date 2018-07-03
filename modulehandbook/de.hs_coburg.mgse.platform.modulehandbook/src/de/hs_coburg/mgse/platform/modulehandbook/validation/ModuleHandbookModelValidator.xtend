@@ -74,16 +74,16 @@ class ModuleHandbookModelValidator extends AbstractModuleHandbookModelValidator 
 	}
 	
 	// "All modules which are specified in the referenced curriculum entry musst be described in the module handbook."
-	@Check
-	def checkSpecifiedModules(ModuleHandbook mhb) {
-
-		val curriculum_entries = mhb.curriculum.curriculumEntries
-		val module_descriptions = mhb.moduleDescriptions
-		
-		for(curriculum_entry : curriculum_entries) {
-			if(!module_descriptions.contains(curriculum_entry)) {
-				error('''The module «curriculum_entry.name» needs to be defined according to specified curriculum.''', curriculum_entry, ModuleHandbookModelPackage.Literals.MODULE_DESCRIPTION__CURRICULUM_ENTRY)
-			}
-		}
-	}
+//	@Check
+//	def checkSpecifiedModules(ModuleHandbook mhb) {
+//
+//		val curriculum_entries = mhb.curriculum.curriculumEntries
+//		val module_descriptions = mhb.moduleDescriptions
+//		
+//		for(curriculum_entry : curriculum_entries) {
+//			if(!module_descriptions.contains(curriculum_entry)) {
+//				error('''The module «curriculum_entry.name» needs to be defined according to specified curriculum.''', curriculum_entry, ModuleHandbookModelPackage.Literals.MODULE_DESCRIPTION__CURRICULUM_ENTRY)
+//			}
+//		}
+//	}
 }
